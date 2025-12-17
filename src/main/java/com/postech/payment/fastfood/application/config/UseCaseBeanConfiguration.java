@@ -24,9 +24,11 @@ public class UseCaseBeanConfiguration {
 
     @Bean
     public ProcessPaymentNotificationUseCase processPaymentNotificationUseCase(
+            OrderRepositoryPort orderRepositoryPort,
             MercadoPagoWebhookSignatureValidator mercadoPagoWebhookSignatureValidator,
             LoggerPort logger) {
         return new ProcessPaymentNotificationUseCaseImpl(
+                orderRepositoryPort,
                 mercadoPagoWebhookSignatureValidator,
                 logger);
     }

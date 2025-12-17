@@ -3,8 +3,9 @@ package com.postech.payment.fastfood.infrastructure.adapters.http;
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.MercadoPagoPort;
 import com.postech.payment.fastfood.domain.exception.FastFoodException;
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.OrderResponse;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.OrderMercadoPagoRequestDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMercadoPagoRequestDto;
 import feign.FeignException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -21,12 +22,11 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
     }
 
     @Override
-    public String createOrder(String idempotencyKey, String accessToken, OrderMercadoPagoRequestDto requestBody, String orderId) {
+    public OrderResponse createOrder(String idempotencyKey, String accessToken, OrderMercadoPagoRequestDto requestBody, String orderId) {
         try {
-            final String resposta = mercadoPagoClient.createOrder(idempotencyKey, "Bearer " + accessToken, requestBody);
+            final OrderResponse resposta = mercadoPagoClient.createOrder(idempotencyKey, "Bearer " + accessToken, requestBody);
             logger.info("[Service][Payment] Resposta MercadoPago: {}", resposta);
             return resposta;
-
         } catch (FeignException e) {
             logger.warn("[Service][Payment] Erro MercadoPago: {}", e.getMessage());
             throw new FastFoodException("Erro ao gerar QR Code de pagamento",

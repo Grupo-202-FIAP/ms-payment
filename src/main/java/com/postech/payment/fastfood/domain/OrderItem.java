@@ -10,6 +10,9 @@ public class OrderItem {
     private Integer quantity;
     private BigDecimal priceAtPurchase;
 
+    public OrderItem() {
+    }
+
     public OrderItem(UUID id, Order order, Product product, Integer quantity, BigDecimal priceAtPurchase) {
         this.id = id;
         this.order = order;

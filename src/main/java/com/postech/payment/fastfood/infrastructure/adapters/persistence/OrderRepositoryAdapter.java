@@ -8,7 +8,6 @@ import com.postech.payment.fastfood.domain.Order;
 import com.postech.payment.fastfood.domain.exception.FastFoodException;
 import com.postech.payment.fastfood.infrastructure.persistence.entity.OrderEntity;
 import com.postech.payment.fastfood.infrastructure.persistence.repository.order.IOrderEntityRepository;
-import com.postech.payment.fastfood.infrastructure.persistence.repository.order.IOrderItemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -19,12 +18,10 @@ import java.util.stream.Collectors;
 public class OrderRepositoryAdapter implements OrderRepositoryPort {
 
     private final IOrderEntityRepository orderEntityRepository;
-    private final IOrderItemRepository orderItemRepository;
     private final LoggerPort logger;
 
-    public OrderRepositoryAdapter(IOrderEntityRepository orderEntityRepository, IOrderItemRepository orderItemRepository, LoggerPort logger) {
+    public OrderRepositoryAdapter(IOrderEntityRepository orderEntityRepository, LoggerPort logger) {
         this.orderEntityRepository = orderEntityRepository;
-        this.orderItemRepository = orderItemRepository;
         this.logger = logger;
     }
 
