@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: ms-payment-fastfood
+  profiles:
+    default: dev
+    active: dev
+  jpa:
+    generate-ddl: false
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:minha-secret}
+
+mercadoPago:
+  publicKey: ${PUBLIC_KEY:minha-public-key}
+  accessToken: ${ACCESS_TOKEN:meu-access-token}
+  clientId: ${CLIENT_ID:meu-client-id}
+  clientSecret: ${CLIENT_SECRET:meu-client-secret}
+  webhook:
+    secretKey: ${WEBHOOK_SECRET:minha-webhook-secret}
