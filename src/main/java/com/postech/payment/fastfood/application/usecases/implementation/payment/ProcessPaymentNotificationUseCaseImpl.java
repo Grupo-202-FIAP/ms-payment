@@ -1,12 +1,9 @@
 package com.postech.payment.fastfood.application.usecases.implementation.payment;
 
-
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.OrderRepositoryPort;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.ProcessPaymentNotificationUseCase;
 import com.postech.payment.fastfood.domain.Order;
-import com.postech.payment.fastfood.domain.enums.OrderStatus;
-import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.exception.FastFoodException;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import com.postech.payment.fastfood.infrastructure.webhook.dao.WebhookEvent;
@@ -56,20 +53,25 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
     }
 
     private void processOrderExpired(Order expiredOrder) {
+        /*
         logger.info("[Webhook][Payment] Order expired for webhook order: {}", expiredOrder);
         expiredOrder.getPayment().setStatus(PaymentStatus.CANCELLED);
         expiredOrder.setStatus(OrderStatus.CANCELLED);
         orderRepositoryPort.save(expiredOrder);
         logger.info("[Webhook][Payment] Order updated to cancelled status:: {}", expiredOrder.getId());
+
+         */
         //send event to update order status and cancel order
     }
 
     private void processOrderSucess(Order order) {
+        /*
         order.getPayment().setStatus(PaymentStatus.AUTHORIZED);
         final Order updatedOrder = orderRepositoryPort.save(order);
         // send event to update order status
         // updateOrderStatusUseCase.execute(updatedOrder.getId());
         logger.info("[Webhook][Payment] Order updated to authorized status: {}", updatedOrder.getId());
+         */
     }
 
 }

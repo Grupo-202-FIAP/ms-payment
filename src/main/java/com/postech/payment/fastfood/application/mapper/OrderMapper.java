@@ -27,7 +27,6 @@ public class OrderMapper {
                         .map(OrderItemMapper::toDomain).toList())
                 .totalPrice(orderEntity.getTotalPrice())
                 .payment(PaymentMapper.toDomain(orderEntity.getPayment()))
-                .updatedAt(orderEntity.getUpdatedAt())
                 .build();
         if (order.getItens() != null) {
             order.getItens().forEach(item -> item.setOrder(order));
@@ -42,14 +41,12 @@ public class OrderMapper {
                 .itens(orderRequest.itens())
                 .totalPrice(orderRequest.totalPrice())
                 .payment(orderRequest.payment())
-                .updatedAt(orderRequest.updatedAt())
                 .build();
         if (order.getItens() != null) {
             order.getItens().forEach(item -> item.setOrder(order));
         }
         return order;
     }
-
 
     public static OrderEntity toEntity(Order order) {
         final OrderEntity orderEntity = OrderEntity.builder()
@@ -61,9 +58,6 @@ public class OrderMapper {
                         .map(OrderItemMapper::toEntity)
                         .toList())
                 .totalPrice(order.getTotalPrice())
-                .orderStatus(order.getStatus())
-                .orderDateTime(order.getOrderDateTime())
-                .updatedAt(order.getUpdatedAt())
                 .build();
 
 
@@ -73,22 +67,6 @@ public class OrderMapper {
 
         return orderEntity;
     }
-    /*
-    public static OrderEntity toEntity(Order order, PaymentEntity paymentEntity) {
-        return OrderEntity.builder()
-                .id(order.getId())
-                .identifier(order.getIdentifier())
-                .itens(order.getItens()
-                        .stream()
-                        .map(OrderItemMapper::toEntity).toList())
-                .totalPrice(order.getTotalPrice())
-                .payment(paymentEntity)
-                .orderStatus(order.getStatus())
-                .orderDateTime(order.getOrderDateTime())
-                .updatedAt(order.getUpdatedAt())
-                .build();
-    }
- */
 
     public static OrderMercadoPagoRequestDto toMercadoPagoV1OrderRequest(Order order, String posId, String mode) {
 
@@ -132,6 +110,5 @@ public class OrderMapper {
                 .items(items)
                 .build();
     }
-
-
+    
 }

@@ -12,11 +12,7 @@ public class ProductMapper {
                 .id(product.getId())
                 .name(product.getName())
                 .category(product.getCategory())
-                .description(product.getDescription())
                 .unitPrice(product.getUnitPrice())
-                .urlImage(product.getUrlImage())
-                .updatedAt(product.getUpdatedAt())
-                .createdAt(product.getCreatedAt())
                 .build();
     }
 
@@ -25,13 +21,9 @@ public class ProductMapper {
                 .id(product.getId())
                 .name(product.getName())
                 .category(product.getCategory())
-                .description(product.getDescription())
                 .unitPrice(product.getUnitPrice())
-                .urlImage(product.getUrlImage())
-                .updatedAt(product.getUpdatedAt())
-                .createdAt(product.getCreatedAt())
                 .build();
 
     }
- 
+
 }

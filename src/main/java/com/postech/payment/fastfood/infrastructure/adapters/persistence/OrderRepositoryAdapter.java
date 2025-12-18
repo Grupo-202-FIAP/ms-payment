@@ -10,9 +10,7 @@ import com.postech.payment.fastfood.infrastructure.persistence.entity.OrderEntit
 import com.postech.payment.fastfood.infrastructure.persistence.repository.order.IOrderEntityRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component
 public class OrderRepositoryAdapter implements OrderRepositoryPort {
@@ -38,37 +36,7 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
         order = OrderMapper.toDomain(orderEntity);
         return order;
     }
-
-    @Override
-    public List<Order> findAll() {
-        logger.info("[Repository][Order] Buscando todos os pedidos");
-
-        final List<Order> orderList = this.orderEntityRepository.findAll().stream().map(OrderMapper::toDomain).collect(Collectors.toList());
-
-        if (orderList.isEmpty()) {
-            logger.warn("[Repository][Order] Nenhum pedido encontrado");
-
-            throw new FastFoodException("Nenhum pedido encontrado", "Não há pedidos registrados no sistema", HttpStatus.NOT_FOUND);
-        }
-
-        logger.info("[Repository][Order] {} pedidos encontrados", orderList.size());
-        return orderList;
-    }
-
-    @Override
-    public List<Order> findByStatus() {
-        logger.info("[Repository][Order] Buscando pedidos ordenados por status");
-
-        final List<Order> orderList = this.orderEntityRepository
-                .findOrdersByStatus()
-                .stream()
-                .map(OrderMapper::toDomain)
-                .collect(Collectors.toList());
-
-        logger.info("[Repository][Order] {} pedidos encontrados ", orderList.size());
-        return orderList;
-    }
-
+    
     @Override
     public Order findByIdentifier(String externalReference) {
         logger.info("[Repository][Order] Buscando pedido por identificador={}", externalReference);

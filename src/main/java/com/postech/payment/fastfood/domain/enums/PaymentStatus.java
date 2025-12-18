@@ -9,7 +9,9 @@ public enum PaymentStatus {
     REJECTED("REJECTED"),
     CANCELLED("CANCELLED"),
     REFUNDED("REFUNDED"),
-    CHARGED_BACK("CHARGED_BACK");
+    CHARGED_BACK("CHARGED_BACK"),
+    UNKNOWN("UNKNOWN"),
+    EXPIRED("EXPIRED");
 
     private final String status;
 

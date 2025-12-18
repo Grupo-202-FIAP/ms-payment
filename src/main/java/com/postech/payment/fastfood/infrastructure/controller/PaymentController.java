@@ -1,10 +1,12 @@
 package com.postech.payment.fastfood.infrastructure.controller;
 
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
+import com.postech.payment.fastfood.application.mapper.OrderMapper;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.CheckPaymentStatusUseCase;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.GenerateQrCodePaymentUseCase;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.OrderRequest;
-import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.OrderResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,10 +35,10 @@ public class PaymentController {
     }
 
     @PostMapping("/qr-code")
-    public ResponseEntity<OrderResponse> generateQrCode(@RequestBody OrderRequest order) {
-        logger.info("[Payment] Iniciando geração de QR Code para o pedido id={}", order.id());
-        final OrderResponse qrCode = generateQrCodePaymentUseCase.execute(order);
-        logger.info("[Payment] QR Code gerado com sucesso para o pedido id={}", order.id());
+    public ResponseEntity<GenerateQrCodeResult> generateQrCode(@RequestBody @Valid OrderRequest orderRequest) {
+        logger.info("[Payment] Iniciando geração de QR Code para o pedido id={}", orderRequest.id());
+        final GenerateQrCodeResult qrCode = generateQrCodePaymentUseCase.execute(OrderMapper.toDomain(orderRequest));
+        logger.info("[Payment] QR Code gerado com sucesso para o pedido id={}", orderRequest.id());
         return ResponseEntity.ok(qrCode);
     }
 

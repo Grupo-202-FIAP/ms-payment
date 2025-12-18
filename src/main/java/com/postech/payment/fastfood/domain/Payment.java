@@ -11,12 +11,16 @@ public class Payment {
     private PaymentStatus status;
     private PaymentMethod paymentMethod;
     private LocalDateTime paymentDateTime;
+    private LocalDateTime updatedAt;
+    private Order order;
 
-    public Payment(UUID id, PaymentStatus status, PaymentMethod paymentMethod, LocalDateTime paymentDateTime) {
+    public Payment(UUID id, PaymentStatus status, PaymentMethod paymentMethod, LocalDateTime paymentDateTime, LocalDateTime updatedAt, Order order) {
         this.id = id;
         this.status = status;
         this.paymentMethod = paymentMethod;
         this.paymentDateTime = paymentDateTime;
+        this.updatedAt = updatedAt;
+        this.order = order;
     }
 
     public Payment() {
@@ -27,6 +31,8 @@ public class Payment {
         this.status = builder.status;
         this.paymentMethod = builder.paymentMethod;
         this.paymentDateTime = builder.paymentDateTime;
+        this.updatedAt = builder.updatedAt;
+        this.order = builder.order;
     }
 
     public UUID getId() {
@@ -61,12 +67,29 @@ public class Payment {
         this.paymentDateTime = paymentDateTime;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 
     public static class Builder {
         private UUID id;
         private PaymentStatus status;
         private PaymentMethod paymentMethod;
         private LocalDateTime paymentDateTime;
+        private LocalDateTime updatedAt;
+        private Order order;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -85,6 +108,16 @@ public class Payment {
 
         public Builder paymentDateTime(LocalDateTime paymentDateTime) {
             this.paymentDateTime = paymentDateTime;
+            return this;
+        }
+
+        public Builder updatedAt(LocalDateTime updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+        public Builder order(Order order) {
+            this.order = order;
             return this;
         }
 
