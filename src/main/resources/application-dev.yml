@@ -2,12 +2,12 @@ spring:
   config:
     activate:
       on-profile: dev
-
+  # Configurações do banco de dados PostgreSQL
   flyway:
     enabled: false
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/fastfood-payment}
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/fastfood-payment}
     username: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
     driver-class-name: org.postgresql.Driver
@@ -17,10 +17,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
+    # Configurações do MongoDB
+  mongodb:
+    uri: mongodb://root:example@localhost:27018/fastfood-payment?authSource=admin
 
-api:
   security:
     token:
       secret: ${JWT_SECRET:minha-secret}

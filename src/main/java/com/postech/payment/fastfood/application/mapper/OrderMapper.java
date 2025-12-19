@@ -3,37 +3,19 @@ package com.postech.payment.fastfood.application.mapper;
 
 import com.postech.payment.fastfood.domain.Order;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.OrderRequest;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.CategoryIdDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.ConfigDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.ItemDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.OrderMercadoPagoRequestDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.PaymentDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.QrConfigDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.TransactionsDto;
-import com.postech.payment.fastfood.infrastructure.persistence.entity.OrderEntity;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.CategoryIdDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ConfigDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ItemDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMPRequestDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.PaymentDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.QrConfigDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.TransactionsDto;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class OrderMapper {
-
-    public static Order toDomain(OrderEntity orderEntity) {
-        final Order order = new Order.Builder()
-                .id(orderEntity.getId())
-                .identifier(orderEntity.getIdentifier())
-                .itens(orderEntity.getItens()
-                        .stream()
-                        .map(OrderItemMapper::toDomain).toList())
-                .totalPrice(orderEntity.getTotalPrice())
-                .payment(PaymentMapper.toDomain(orderEntity.getPayment()))
-                .updatedAt(orderEntity.getUpdatedAt())
-                .build();
-        if (order.getItens() != null) {
-            order.getItens().forEach(item -> item.setOrder(order));
-        }
-        return order;
-    }
 
     public static Order toDomain(OrderRequest orderRequest) {
         final Order order = new Order.Builder()
@@ -42,56 +24,11 @@ public class OrderMapper {
                 .itens(orderRequest.itens())
                 .totalPrice(orderRequest.totalPrice())
                 .payment(orderRequest.payment())
-                .updatedAt(orderRequest.updatedAt())
                 .build();
-        if (order.getItens() != null) {
-            order.getItens().forEach(item -> item.setOrder(order));
-        }
         return order;
     }
 
-
-    public static OrderEntity toEntity(Order order) {
-        final OrderEntity orderEntity = OrderEntity.builder()
-                .id(order.getId())
-                .identifier(order.getIdentifier())
-                .payment(PaymentMapper.toEntity(order.getPayment()))
-                .itens(order.getItens()
-                        .stream()
-                        .map(OrderItemMapper::toEntity)
-                        .toList())
-                .totalPrice(order.getTotalPrice())
-                .orderStatus(order.getStatus())
-                .orderDateTime(order.getOrderDateTime())
-                .updatedAt(order.getUpdatedAt())
-                .build();
-
-
-        if (orderEntity.getItens() != null) {
-            orderEntity.getItens().forEach(item -> item.setOrder(orderEntity));
-        }
-
-        return orderEntity;
-    }
-    /*
-    public static OrderEntity toEntity(Order order, PaymentEntity paymentEntity) {
-        return OrderEntity.builder()
-                .id(order.getId())
-                .identifier(order.getIdentifier())
-                .itens(order.getItens()
-                        .stream()
-                        .map(OrderItemMapper::toEntity).toList())
-                .totalPrice(order.getTotalPrice())
-                .payment(paymentEntity)
-                .orderStatus(order.getStatus())
-                .orderDateTime(order.getOrderDateTime())
-                .updatedAt(order.getUpdatedAt())
-                .build();
-    }
- */
-
-    public static OrderMercadoPagoRequestDto toMercadoPagoV1OrderRequest(Order order, String posId, String mode) {
-
+    public static OrderMPRequestDto toMPVOrderRequest(Order order, String posId, String mode) {
         final var items = order.getItens().stream().map(item ->
                 ItemDto.builder()
                         .title(item.getProduct().getName())
@@ -121,7 +58,7 @@ public class OrderMapper {
                 .payments(paymentDtos)
                 .build();
 
-        return OrderMercadoPagoRequestDto.builder()
+        return OrderMPRequestDto.builder()
                 .type("qr")
                 .total_amount(order.getTotalPrice().toString())
                 .description("Pedido FastFood - " + order.getIdentifier())
@@ -132,6 +69,5 @@ public class OrderMapper {
                 .items(items)
                 .build();
     }
-
 
 }

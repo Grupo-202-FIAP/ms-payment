@@ -1,7 +1,8 @@
 package com.postech.payment.fastfood.application.usecases.interfaces.payment;
 
-import com.postech.payment.fastfood.infrastructure.controller.dto.request.OrderRequest;
+import com.postech.payment.fastfood.domain.Order;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
 
 public interface GenerateQrCodePaymentUseCase {
-    String execute(OrderRequest order);
+    GenerateQrCodeResult execute(Order order);
 }

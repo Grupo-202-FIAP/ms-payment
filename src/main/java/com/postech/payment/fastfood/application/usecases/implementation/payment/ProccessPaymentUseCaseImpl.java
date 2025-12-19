@@ -1,9 +1,8 @@
 package com.postech.payment.fastfood.application.usecases.implementation.payment;
 
-
-import com.postech.payment.fastfood.application.gateways.PaymentRepositoryPort;
-import com.postech.payment.fastfood.application.usecases.interfaces.payment.ProccessPaymentUseCase;
-import com.postech.payment.fastfood.domain.exception.FastFoodException;
+import com.postech.fastfood.application.gateways.PaymentRepositoryPort;
+import com.postech.fastfood.application.usecases.interfaces.payment.ProccessPaymentUseCase;
+import com.postech.fastfood.domain.exception.FastFoodException;
 import org.springframework.http.HttpStatus;
 import java.util.UUID;
 

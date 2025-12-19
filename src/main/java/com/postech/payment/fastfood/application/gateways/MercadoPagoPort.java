@@ -1,8 +1,9 @@
 package com.postech.payment.fastfood.application.gateways;
 
 
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.OrderMercadoPagoRequestDto;
+import com.postech.payment.fastfood.domain.Order;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
 
 public interface MercadoPagoPort {
-    String createOrder(String idempotencyKey, String accessToken, OrderMercadoPagoRequestDto requestBody, String orderId);
+    GenerateQrCodeResult createQrCode(Order order);
 }
