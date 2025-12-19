@@ -2,7 +2,7 @@ package com.postech.payment.fastfood.infrastructure.controller.dto.response.merc
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record OrderItem(
+public record OrderItemMP(
         @JsonProperty("title")
         String title,
         @JsonProperty("unit_price")

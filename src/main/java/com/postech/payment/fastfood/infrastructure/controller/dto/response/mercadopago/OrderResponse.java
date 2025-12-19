@@ -19,7 +19,7 @@ public record OrderResponse(
         OffsetDateTime createdDate,
         @JsonProperty("config")
         QrConfig config,
-        List<OrderItem> items,
+        List<OrderItemMP> items,
         @JsonProperty("type_response")
         TypeResponse typeResponse) {
 }

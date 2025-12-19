@@ -1,8 +1,8 @@
 package com.postech.payment.fastfood.domain;
 
-
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,15 +12,17 @@ public class Payment {
     private PaymentMethod paymentMethod;
     private LocalDateTime paymentDateTime;
     private LocalDateTime updatedAt;
-    private Order order;
+    private BigDecimal amount;
+    private UUID orderId;
 
-    public Payment(UUID id, PaymentStatus status, PaymentMethod paymentMethod, LocalDateTime paymentDateTime, LocalDateTime updatedAt, Order order) {
+    public Payment(UUID id, PaymentStatus status, PaymentMethod paymentMethod, LocalDateTime paymentDateTime, LocalDateTime updatedAt, BigDecimal amount, UUID orderId) {
         this.id = id;
         this.status = status;
         this.paymentMethod = paymentMethod;
         this.paymentDateTime = paymentDateTime;
         this.updatedAt = updatedAt;
-        this.order = order;
+        this.amount = amount;
+        this.orderId = orderId;
     }
 
     public Payment() {
@@ -32,8 +34,10 @@ public class Payment {
         this.paymentMethod = builder.paymentMethod;
         this.paymentDateTime = builder.paymentDateTime;
         this.updatedAt = builder.updatedAt;
-        this.order = builder.order;
+        this.orderId = builder.orderId;
+        this.amount = builder.amount;
     }
+
 
     public UUID getId() {
         return id;
@@ -75,12 +79,20 @@ public class Payment {
         this.updatedAt = updatedAt;
     }
 
-    public Order getOrder() {
-        return order;
+    public UUID getOrderId() {
+        return orderId;
     }
 
-    public void setOrder(Order order) {
-        this.order = order;
+    public void setOrderId(UUID orderId) {
+        this.orderId = orderId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public static class Builder {
@@ -89,7 +101,8 @@ public class Payment {
         private PaymentMethod paymentMethod;
         private LocalDateTime paymentDateTime;
         private LocalDateTime updatedAt;
-        private Order order;
+        private BigDecimal amount;
+        private UUID orderId;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -116,8 +129,13 @@ public class Payment {
             return this;
         }
 
-        public Builder order(Order order) {
-            this.order = order;
+        public Builder orderId(UUID orderId) {
+            this.orderId = orderId;
+            return this;
+        }
+
+        public Builder amount(BigDecimal amount) {
+            this.amount = amount;
             return this;
         }
 

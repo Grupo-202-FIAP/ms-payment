@@ -1,11 +1,12 @@
 spring:
   application:
     name: ms-payment-fastfood
+
   profiles:
     default: dev
-    active: dev
+
   jpa:
-    generate-ddl: false
+    generate-ddl: true
     show-sql: true
 
 management:
@@ -21,6 +22,9 @@ management:
 springdoc:
   swagger-ui:
     enabled: true
+
+server:
+  port: ${SERVER_PORT:8084}
 
 api:
   security:

@@ -2,7 +2,6 @@ package com.postech.payment.fastfood.infrastructure.controller.dto.request;
 
 import com.postech.payment.fastfood.domain.OrderItem;
 import com.postech.payment.fastfood.domain.Payment;
-import com.postech.payment.fastfood.domain.enums.OrderStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,11 +17,10 @@ public record OrderRequest(
         String identifier,
         @Positive
         BigDecimal totalPrice,
-        OrderStatus status,
         LocalDateTime orderDateTime,
         Payment payment,
         @NotEmpty
-        List<OrderItem> itens,
-        LocalDateTime updatedAt
+        List<OrderItem> itens
+
 ) {
 }

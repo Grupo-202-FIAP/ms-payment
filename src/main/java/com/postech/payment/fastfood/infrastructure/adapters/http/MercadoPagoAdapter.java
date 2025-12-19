@@ -8,13 +8,14 @@ import com.postech.payment.fastfood.domain.exception.FastFoodException;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
 import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.OrderResponse;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMercadoPagoRequestDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMPRequestDto;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Component
 public class MercadoPagoAdapter implements MercadoPagoPort {
@@ -29,23 +30,24 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
     public MercadoPagoAdapter(MercadoPagoClient mercadoPagoClient, LoggerPort logger) {
         this.mercadoPagoClient = mercadoPagoClient;
         this.logger = logger;
+
     }
 
     @Override
     public GenerateQrCodeResult createQrCode(Order order) {
 
-        final OrderMercadoPagoRequestDto requestBody = OrderMapper
-                .toMercadoPagoV1OrderRequest(order, externalPosId, "dynamic");
+        final OrderMPRequestDto requestBody = OrderMapper.toMPVOrderRequest(order, externalPosId, "dynamic");
         try {
-            final OrderResponse resposta = mercadoPagoClient.createOrder(order.getId().toString(), "Bearer " + accessToken, requestBody);
-            logger.info("[Service][Payment] Resposta MercadoPago: {}", resposta);
+            final OrderResponse response = mercadoPagoClient
+                    .createOrder(UUID.randomUUID().toString(), "Bearer " + accessToken, requestBody);
+            logger.info("[Service][Payment] Resposta MercadoPago: {}", response);
             final OffsetDateTime expiresAt = OffsetDateTime.now().plusHours(2);
             return new GenerateQrCodeResult(
                     order.getId().toString(),
-                    resposta.id(),
-                    BigDecimal.valueOf(resposta.totalAmount()),
-                    resposta.currency(),
-                    resposta.typeResponse().qrData(),
+                    response.id(),
+                    BigDecimal.valueOf(response.totalAmount()),
+                    response.currency(),
+                    response.typeResponse().qrData(),
                     expiresAt
             );
         } catch (FeignException e) {

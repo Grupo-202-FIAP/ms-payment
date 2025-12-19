@@ -4,6 +4,7 @@ import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.MercadoPagoPort;
 import com.postech.payment.fastfood.domain.Order;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
+import com.postech.payment.fastfood.support.builders.OrderTestBuilder;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,12 +29,12 @@ class GenerateQrCodePaymentUseCaseImplTest {
 
     @Nested
     class execute {
-        
+
         @Test
         void shouldCallGenerateQrCodePaymentUseCaseImpl() {
 
-            //ARRANGE
-            Order order1 = mock(Order.class);
+            Order order1 = OrderTestBuilder.validOrder();
+             
             GenerateQrCodeResult responseMock = mock(GenerateQrCodeResult.class);
             when(mercadoPagoPort.createQrCode(order1))
                     .thenReturn(responseMock);

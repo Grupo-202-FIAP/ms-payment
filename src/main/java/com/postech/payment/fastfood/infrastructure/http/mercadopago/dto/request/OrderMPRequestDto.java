@@ -4,7 +4,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record OrderMercadoPagoRequestDto(
+public record OrderMPRequestDto(
         String type,
         String total_amount,
         String description,

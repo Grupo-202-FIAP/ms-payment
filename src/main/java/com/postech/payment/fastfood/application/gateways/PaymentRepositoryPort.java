@@ -1,8 +1,7 @@
 package com.postech.payment.fastfood.application.gateways;
 
-import java.util.UUID;
+import com.postech.payment.fastfood.domain.Payment;
 
 public interface PaymentRepositoryPort {
-
-    void save(UUID orderId);
+    void save(Payment payment);
 }

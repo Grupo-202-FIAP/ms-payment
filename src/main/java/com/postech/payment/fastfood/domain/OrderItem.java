@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class OrderItem {
     private UUID id;
-    private Order order;
     private Product product;
     private Integer quantity;
     private BigDecimal priceAtPurchase;
@@ -15,7 +14,6 @@ public class OrderItem {
 
     public OrderItem(UUID id, Order order, Product product, Integer quantity, BigDecimal priceAtPurchase) {
         this.id = id;
-        this.order = order;
         this.product = product;
         this.quantity = quantity;
         this.priceAtPurchase = priceAtPurchase;
@@ -23,7 +21,6 @@ public class OrderItem {
 
     public OrderItem(Builder builder) {
         this.id = builder.id;
-        this.order = builder.order;
         this.product = builder.product;
         this.quantity = builder.quantity;
         this.priceAtPurchase = builder.priceAtPurchase;
@@ -37,14 +34,6 @@ public class OrderItem {
         this.id = id;
     }
 
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
     public Product getProduct() {
         return product;
     }
@@ -56,22 +45,16 @@ public class OrderItem {
     public BigDecimal getPriceAtPurchase() {
         return priceAtPurchase;
     }
-    
+
     public static class Builder {
 
         private UUID id;
-        private Order order;
         private Product product;
         private Integer quantity;
         private BigDecimal priceAtPurchase;
 
         public Builder id(UUID id) {
             this.id = id;
-            return this;
-        }
-
-        public Builder order(Order order) {
-            this.order = order;
             return this;
         }
 

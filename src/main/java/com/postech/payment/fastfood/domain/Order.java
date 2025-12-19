@@ -2,7 +2,6 @@ package com.postech.payment.fastfood.domain;
 
 import com.postech.payment.fastfood.domain.enums.OrderStatus;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,8 +14,8 @@ public class Order {
 
     public Order(
             UUID id,
-            String identifier, BigDecimal totalPrice, OrderStatus status, LocalDateTime orderDateTime, Payment payment,
-            List<OrderItem> itens, LocalDateTime updatedAt) {
+            String identifier, BigDecimal totalPrice, OrderStatus status, Payment payment,
+            List<OrderItem> itens) {
         this.id = id;
         this.identifier = identifier;
         this.totalPrice = totalPrice;
@@ -48,10 +47,6 @@ public class Order {
         return totalPrice;
     }
 
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
     public Payment getPayment() {
         return payment;
     }
@@ -71,7 +66,6 @@ public class Order {
     public static class Builder {
         private UUID id;
         private BigDecimal totalPrice;
-        private OrderStatus status;
         private Payment payment;
         private List<OrderItem> itens;
         private String identifier;
@@ -89,14 +83,6 @@ public class Order {
             }
             return this;
         }
-
-        public Builder status(OrderStatus status) {
-            if (status != null) {
-                this.status = status;
-            }
-            return this;
-        }
-
 
         public Builder itens(List<OrderItem> itens) {
             if (itens != null) {
