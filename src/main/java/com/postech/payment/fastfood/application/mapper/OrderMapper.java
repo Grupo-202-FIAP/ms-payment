@@ -1,8 +1,8 @@
 package com.postech.payment.fastfood.application.mapper;
 
 
-import com.postech.payment.fastfood.domain.Order;
-import com.postech.payment.fastfood.infrastructure.controller.dto.request.OrderRequest;
+import com.postech.payment.fastfood.domain.OrderItem;
+import com.postech.payment.fastfood.domain.Payment;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.CategoryIdDto;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ConfigDto;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ItemDto;
@@ -17,19 +17,8 @@ import java.util.stream.Collectors;
 @Component
 public class OrderMapper {
 
-    public static Order toDomain(OrderRequest orderRequest) {
-        final Order order = new Order.Builder()
-                .id(orderRequest.id())
-                .identifier(orderRequest.identifier())
-                .itens(orderRequest.itens())
-                .totalPrice(orderRequest.totalPrice())
-                .payment(orderRequest.payment())
-                .build();
-        return order;
-    }
-
-    public static OrderMPRequestDto toMPVOrderRequest(Order order, String posId, String mode) {
-        final var items = order.getItens().stream().map(item ->
+    public static OrderMPRequestDto toMPVOrderRequest(Payment payment, List<OrderItem> orderItems, String posId, String mode) {
+        final var items = orderItems.stream().map(item ->
                 ItemDto.builder()
                         .title(item.getProduct().getName())
                         .unit_price(item.getProduct().getUnitPrice().toString())
@@ -50,7 +39,7 @@ public class OrderMapper {
                                 .build())
                 .build();
         final PaymentDto paymentDto = PaymentDto.builder()
-                .amount(order.getTotalPrice().toString())
+                .amount(payment.getAmount().toString())
                 .build();
         final List<PaymentDto> paymentDtos = List.of(paymentDto);
 
@@ -60,9 +49,9 @@ public class OrderMapper {
 
         return OrderMPRequestDto.builder()
                 .type("qr")
-                .total_amount(order.getTotalPrice().toString())
-                .description("Pedido FastFood - " + order.getIdentifier())
-                .external_reference(order.getIdentifier())
+                .total_amount(payment.getAmount().toString())
+                .description("Pedido FastFood - " + payment.getOrderId())
+                .external_reference(payment.getOrderId().toString())
                 .expiration_time("PT2H") // 2 horas expiração
                 .config(config)
                 .transactions(transactionsDto)

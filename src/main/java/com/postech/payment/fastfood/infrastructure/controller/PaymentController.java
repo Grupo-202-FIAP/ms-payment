@@ -1,10 +1,10 @@
 package com.postech.payment.fastfood.infrastructure.controller;
 
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
-import com.postech.payment.fastfood.application.mapper.OrderMapper;
+import com.postech.payment.fastfood.application.mapper.PaymentMapper;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.GenerateQrCodePaymentUseCase;
-import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
-import com.postech.payment.fastfood.infrastructure.controller.dto.request.OrderRequest;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.GeneratedQrCodeResponse;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.PaymentQrCodeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,10 +27,16 @@ public class PaymentController {
     }
 
     @PostMapping("/qr-code")
-    public ResponseEntity<GenerateQrCodeResult> generateQrCode(@RequestBody @Valid OrderRequest orderRequest) {
-        logger.info("[Payment] Iniciando geração de QR Code para o pedido id={}", orderRequest.id());
-        final GenerateQrCodeResult qrCode = generateQrCodePaymentUseCase.execute(OrderMapper.toDomain(orderRequest));
-        logger.info("[Payment] QR Code gerado com sucesso para o pedido id={}", orderRequest.id());
+    public ResponseEntity<GeneratedQrCodeResponse> generateQrCode(@RequestBody @Valid PaymentQrCodeRequest paymentQrCodeReques) {
+        logger.info("[Payment] Iniciando geração de QR Code para o pedido id={}", paymentQrCodeReques.orderId());
+        final GeneratedQrCodeResponse qrCode = generateQrCodePaymentUseCase
+                .execute(
+                        PaymentMapper.toDomain(paymentQrCodeReques),
+                        paymentQrCodeReques.items()
+                );
+        logger.info(
+                "[Payment] QR Code gerado com sucesso para o pedido id={}",
+                paymentQrCodeReques.orderId());
         return ResponseEntity.ok(qrCode);
     }
 }

@@ -2,9 +2,8 @@ package com.postech.payment.fastfood.application.mapper;
 
 
 import com.postech.payment.fastfood.domain.Payment;
-import com.postech.payment.fastfood.infrastructure.controller.dto.request.GenerateQrCodeResult;
+import com.postech.payment.fastfood.infrastructure.controller.dto.request.PaymentQrCodeRequest;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.PaymentRequest;
-import com.postech.payment.fastfood.infrastructure.persistence.documents.PaymentInformationQrCodeDocument;
 import com.postech.payment.fastfood.infrastructure.persistence.entity.PaymentEntity;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Component;
@@ -15,13 +14,17 @@ public class PaymentMapper {
         if (paymentEntity == null) {
             return null;
         }
-        return new Payment.Builder()
+
+        final Payment payment = new Payment.Builder()
                 .id(paymentEntity.getId())
                 .status(paymentEntity.getStatus())
                 .paymentMethod(paymentEntity.getPaymentMethod())
                 .paymentDateTime(paymentEntity.getPaymentDateTime())
                 .orderId(paymentEntity.getOrderId())
+                .amount(paymentEntity.getAmount())
+                .qrCode(QrCodeMapper.toDomain(paymentEntity.getQrCode()))
                 .build();
+        return payment;
     }
 
     public static PaymentEntity toEntity(Payment payment) {
@@ -32,6 +35,7 @@ public class PaymentMapper {
                 .orderId(payment.getOrderId())
                 .paymentDateTime(payment.getPaymentDateTime())
                 .amount(payment.getAmount())
+                .qrCode(QrCodeMapper.toEntity(payment.getQrCode()))
                 .build();
     }
 
@@ -41,17 +45,11 @@ public class PaymentMapper {
                 .build();
     }
 
-    public static PaymentInformationQrCodeDocument toPaymentDocument(GenerateQrCodeResult generateQrCodeResult) {
-        return PaymentInformationQrCodeDocument
-                .builder()
-                .qrCode(generateQrCodeResult.qrCode())
-                .paymentId(generateQrCodeResult.paymentId())
-                .orderId(generateQrCodeResult.orderId())
-                .totalAmount(generateQrCodeResult.totalAmount())
-                .currency(generateQrCodeResult.currency())
-                .expiresAt(generateQrCodeResult.expiresAt() != null
-                        ? generateQrCodeResult.expiresAt().toInstant()
-                        : null)
+
+    public static Payment toDomain(PaymentQrCodeRequest paymentQrCodeRequest) {
+        return new Payment.Builder()
+                .orderId(paymentQrCodeRequest.orderId())
+                .amount(paymentQrCodeRequest.totalPrice())
                 .build();
     }
 }

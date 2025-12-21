@@ -1,7 +1,7 @@
 package com.postech.payment.fastfood.infrastructure.adapters.persistence;
 
 import com.postech.payment.fastfood.application.gateways.PaymentInformationQrCodeRepositoryPort;
-import com.postech.payment.fastfood.infrastructure.persistence.documents.PaymentInformationQrCodeDocument;
+import com.postech.payment.fastfood.infrastructure.persistence.entity.QrCodeEntity;
 import com.postech.payment.fastfood.infrastructure.persistence.repository.payment.IPaymentInformationQrCodeRepository;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class PaymentInformationQrCodeRepositoryAdapter implements PaymentInforma
     }
 
     @Override
-    public void save(PaymentInformationQrCodeDocument paymentInformationQrCode) {
+    public void save(QrCodeEntity paymentInformationQrCode) {
         paymentInformationQrCodeRepositoryAdapter.save(paymentInformationQrCode);
     }
 }
