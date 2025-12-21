@@ -14,8 +14,15 @@ public class Payment {
     private LocalDateTime updatedAt;
     private BigDecimal amount;
     private UUID orderId;
+    private QrCode qrCode;
 
-    public Payment(UUID id, PaymentStatus status, PaymentMethod paymentMethod, LocalDateTime paymentDateTime, LocalDateTime updatedAt, BigDecimal amount, UUID orderId) {
+    public Payment(UUID id,
+                   PaymentStatus status,
+                   PaymentMethod paymentMethod,
+                   LocalDateTime paymentDateTime,
+                   LocalDateTime updatedAt,
+                   BigDecimal amount, UUID orderId,
+                   QrCode qrCode) {
         this.id = id;
         this.status = status;
         this.paymentMethod = paymentMethod;
@@ -23,6 +30,7 @@ public class Payment {
         this.updatedAt = updatedAt;
         this.amount = amount;
         this.orderId = orderId;
+        this.qrCode = qrCode;
     }
 
     public Payment() {
@@ -36,8 +44,8 @@ public class Payment {
         this.updatedAt = builder.updatedAt;
         this.orderId = builder.orderId;
         this.amount = builder.amount;
+        this.qrCode = builder.qrCode;
     }
-
 
     public UUID getId() {
         return id;
@@ -79,6 +87,14 @@ public class Payment {
         this.updatedAt = updatedAt;
     }
 
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
     public UUID getOrderId() {
         return orderId;
     }
@@ -87,12 +103,12 @@ public class Payment {
         this.orderId = orderId;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public QrCode getQrCode() {
+        return qrCode;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setQrCode(QrCode qrCode) {
+        this.qrCode = qrCode;
     }
 
     public static class Builder {
@@ -103,6 +119,7 @@ public class Payment {
         private LocalDateTime updatedAt;
         private BigDecimal amount;
         private UUID orderId;
+        private QrCode qrCode;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -136,6 +153,11 @@ public class Payment {
 
         public Builder amount(BigDecimal amount) {
             this.amount = amount;
+            return this;
+        }
+
+        public Builder qrCode(QrCode qrCode) {
+            this.qrCode = qrCode;
             return this;
         }
 

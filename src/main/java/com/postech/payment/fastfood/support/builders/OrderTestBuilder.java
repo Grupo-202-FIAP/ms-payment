@@ -33,7 +33,7 @@ public class OrderTestBuilder {
                 .build();
 
         final Payment payment = new Payment.Builder()
-                .status(PaymentStatus.PENDING)
+                .status(PaymentStatus.UNKNOWN)
                 .paymentMethod(PaymentMethod.QR_CODE)
                 .build();
 

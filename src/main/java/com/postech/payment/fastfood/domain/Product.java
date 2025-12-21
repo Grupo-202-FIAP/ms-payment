@@ -3,7 +3,6 @@ package com.postech.payment.fastfood.domain;
 
 import com.postech.payment.fastfood.domain.enums.Category;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 
 public class Product {
@@ -15,20 +14,11 @@ public class Product {
     public Product() {
     }
 
-    public Product(
-            Long id,
-            String name,
-            String urlImage,
-            BigDecimal unitPrice,
-            Category category,
-            String description,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt
-    ) {
+    public Product(Long id, String name, Category category, BigDecimal unitPrice) {
         this.id = id;
         this.name = name;
-        this.unitPrice = unitPrice;
         this.category = category;
+        this.unitPrice = unitPrice;
     }
 
     public Product(Builder builder) {
@@ -85,7 +75,7 @@ public class Product {
             this.name = name;
             return this;
         }
-        
+
         public Builder unitPrice(BigDecimal unitPrice) {
             this.unitPrice = unitPrice;
             return this;
