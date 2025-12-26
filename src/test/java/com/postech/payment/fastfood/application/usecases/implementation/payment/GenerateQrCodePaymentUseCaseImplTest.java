@@ -1,7 +1,7 @@
 package com.postech.payment.fastfood.application.usecases.implementation.payment;
 
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
-import com.postech.payment.fastfood.application.gateways.MercadoPagoPort;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
+import com.postech.payment.fastfood.application.ports.output.MercadoPagoPort;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

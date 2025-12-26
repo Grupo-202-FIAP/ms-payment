@@ -1,7 +1,7 @@
 package com.postech.payment.fastfood.infrastructure.adapters.logging;
 
 
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

@@ -1,9 +1,9 @@
 package com.postech.payment.fastfood.utils;
 
 import com.postech.payment.fastfood.application.exception.ConversionException;
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
-import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventOrder;
-import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventPayment;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
+import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.EventOrder;
+import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;

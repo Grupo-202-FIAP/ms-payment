@@ -2,15 +2,15 @@ package com.postech.payment.fastfood.application.usecases.implementation.payment
 
 
 import com.postech.payment.fastfood.application.exception.NotificationValidationException;
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
-import com.postech.payment.fastfood.application.gateways.PaymentRepositoryPort;
-import com.postech.payment.fastfood.application.gateways.PublishEventPaymentStatusPort;
-import com.postech.payment.fastfood.application.usecases.interfaces.payment.ProcessPaymentNotificationUseCase;
-import com.postech.payment.fastfood.domain.Payment;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
+import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
+import com.postech.payment.fastfood.application.ports.output.PublishEventPaymentStatusPort;
+import com.postech.payment.fastfood.application.usecases.ports.input.ProcessPaymentNotificationUseCase;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
-import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventPayment;
+import com.postech.payment.fastfood.domain.model.Payment;
+import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.dao.WebhookEvent;
+import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
-import com.postech.payment.fastfood.infrastructure.webhook.dao.WebhookEvent;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
