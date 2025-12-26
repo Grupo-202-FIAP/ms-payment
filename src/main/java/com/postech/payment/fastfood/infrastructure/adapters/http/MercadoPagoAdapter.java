@@ -40,7 +40,7 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
 
     @Override
     public GeneratedQrCodeResponse createQrCode(Payment payment, List<OrderItem> items) {
-        logger.info("[Adapter][MercadoPago] Solicitando QR Code para o pedido: {}", payment.getOrderId());
+        logger.info("[ADAPTER][MERCADOPAGO] Requesting QR Code for order: {}", payment.getOrderId());
 
         final OrderMPRequestDto requestBody = OrderMapper.toMPVOrderRequest(payment, items, externalPosId, "dynamic");
 
@@ -54,8 +54,8 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
             return mapToGeneratedQrCodeResponse(payment, response);
 
         } catch (feign.RetryableException e) {
-            logger.error("[Adapter][MercadoPago] Erro de conectividade com a API para o pedido: {}", payment.getOrderId());
-            throw new PaymentIntegrationException("Serviço de pagamento temporariamente indisponível", e);
+            logger.error("[ADAPTER][MERCADOPAGO] Connectivity error with API for order: {}", payment.getOrderId());
+            throw new PaymentIntegrationException("Payment service temporarily unavailable", e);
 
         } catch (FeignException e) {
             handleFeignException(payment, e);
@@ -64,7 +64,7 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
     }
 
     private GeneratedQrCodeResponse mapToGeneratedQrCodeResponse(Payment payment, OrderResponse response) {
-        final OffsetDateTime expiresAt = OffsetDateTime.now().plusMinutes(1);
+        final OffsetDateTime expiresAt = OffsetDateTime.now().plusMinutes(10);
 
         return new GeneratedQrCodeResponse(
                 payment.getOrderId(),
@@ -80,17 +80,17 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
         final HttpStatus status = HttpStatus.resolve(e.status());
         final String errorDetails = e.contentUTF8();
 
-        logger.warn("[Adapter][MercadoPago] Falha na API externa. Status: {} | Detalhes: {} | Pedido: {}",
+        logger.warn("[ADAPTER][MERCADOPAGO] External API failure. Status: {} | Details: {} | Order: {}",
                 status, errorDetails, payment.getOrderId());
 
         if (status != null && status.is4xxClientError()) {
             throw new PaymentIntegrationException(
-                    "Dados de pagamento inválidos na integração para o pedido: " + payment.getOrderId(), e
+                    "Invalid payment data in integration for order: " + payment.getOrderId(), e
             );
         }
 
         throw new PaymentIntegrationException(
-                "Serviço de pagamento temporariamente indisponível para o pedido: " + payment.getOrderId(), e
+                "Payment service temporarily unavailable for order: " + payment.getOrderId(), e
         );
     }
 }

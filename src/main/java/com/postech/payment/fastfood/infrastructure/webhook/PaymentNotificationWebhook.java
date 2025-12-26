@@ -38,25 +38,25 @@ public class PaymentNotificationWebhook {
             HttpServletRequest request) {
 
 
-        logger.info("[Webhook][Payment][DEBUG] === ALL QUERY PARAMS ===");
+        logger.info("[WEBHOOK][PAYMENT][DEBUG] === ALL QUERY PARAMS ===");
         request.getParameterMap().forEach((key, values) ->
-                logger.info("[Webhook][Payment][DEBUG] Param: '{}' = '{}'", key, String.join(",", values))
+                logger.info("[WEBHOOK][PAYMENT][DEBUG] Param: '{}' = '{}'", key, String.join(",", values))
         );
 
         // DEBUG: Log dos headers
-        logger.info("[Webhook][Payment][DEBUG] x-signature: '{}'", signature);
-        logger.info("[Webhook][Payment][DEBUG] x-request-id: '{}'", requestId);
+        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-signature: '{}'", signature);
+        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-request-id: '{}'", requestId);
 
         final String finalDataId = dataIdParam != null ? dataIdParam : idParam;
 
         if (finalDataId == null) {
-            logger.error("[Webhook][Payment] ERROR: No 'data.id' or 'id' parameter found!");
-            logger.error("[Webhook][Payment] Available params: {}", request.getParameterMap().keySet());
+            logger.error("[WEBHOOK][PAYMENT] ERROR: No 'data.id' or 'id' parameter found!");
+            logger.error("[WEBHOOK][PAYMENT] Available params: {}", request.getParameterMap().keySet());
             return ResponseEntity.badRequest().body("Missing required parameter: data.id or id");
         }
 
-        logger.info("[Webhook][Payment] Using dataId: '{}'", finalDataId);
-        logger.info("[Webhook][Payment] Received payment notification: event={}, signature={}, requestId={}, dataId={}",
+        logger.info("[WEBHOOK][PAYMENT] Using dataId: '{}'", finalDataId);
+        logger.info("[WEBHOOK][PAYMENT] Received payment notification: event={}, signature={}, requestId={}, dataId={}",
                 webhookEvent, signature, requestId, finalDataId);
 
         processPaymentNotification.execute(webhookEvent, signature, requestId, finalDataId);

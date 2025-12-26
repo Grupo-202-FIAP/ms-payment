@@ -28,26 +28,25 @@ public class PaymentRepositoryAdapter implements PaymentRepositoryPort {
 
     @Override
     @Transactional
-    public Payment save(Payment payment) {
-        logger.info("[Repository] Salvando pagamento para o pedido: {}", payment.getOrderId());
+    public void save(Payment payment) {
+        logger.info("[REPOSITORY][PAYMENT] Saving payment for order: {}", payment.getOrderId());
         try {
             final PaymentEntity entity = PaymentMapper.toEntity(payment);
             bindRelations(entity);
-            final PaymentEntity saved = paymentEntityRepository.saveAndFlush(entity);
-            return PaymentMapper.toDomain(saved);
+            paymentEntityRepository.saveAndFlush(entity);
         } catch (DataIntegrityViolationException e) {
-            logger.error("Este pagamento já foi processado ou viola regras de integridade.");
-            throw new DatabaseException("Falha ao salvar pagamento", e);
+            logger.error("[REPOSITORY][PAYMENT] This payment has already been processed or violates integrity rules.");
+            throw new DatabaseException("Failed to save payment", e);
         } catch (DataAccessException e) {
-            logger.error("Erro genérico de banco de dados");
-            throw new DatabaseException("Falha ao salvar pagamento", e);
+            logger.error("[REPOSITORY][PAYMENT] Generic database error");
+            throw new DatabaseException("Failed to save payment", e);
         }
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Payment> findByOrderId(UUID orderId) {
-        logger.debug("[Repository] Buscando pagamento por OrderId: {}", orderId);
+        logger.debug("[REPOSITORY][PAYMENT] Searching payment by OrderId: {}", orderId);
         final Optional<PaymentEntity> byOrderId = paymentEntityRepository.findByOrderId(orderId);
         return byOrderId.map(PaymentMapper::toDomain);
     }

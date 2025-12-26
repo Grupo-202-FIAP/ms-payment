@@ -25,13 +25,13 @@ public class PaymentInformationQrCodeRepositoryAdapter implements PaymentInforma
     @Override
     @Transactional
     public void save(QrCode qrCode) {
-        logger.info("[Repository] Persistindo informações do QR Code para o pedido: {}", qrCode.getOrderId());
+        logger.info("[REPOSITORY] Persisting QR Code information for order: {}", qrCode.getOrderId());
         try {
             final QrCodeEntity entity = QrCodeMapper.toEntity(qrCode);
             qrCodeRepository.save(entity);
         } catch (DataAccessException e) {
-            logger.error("[Repository] Erro ao salvar informações do QR Code para o pedido: {}", qrCode.getOrderId(), e);
-            throw new DatabaseException("Erro ao persistir informações do QR Code", e);
+            logger.error("[REPOSITORY] Error saving QR Code information for order: {}", qrCode.getOrderId(), e);
+            throw new DatabaseException("Error persisting QR Code information", e);
         }
     }
 }

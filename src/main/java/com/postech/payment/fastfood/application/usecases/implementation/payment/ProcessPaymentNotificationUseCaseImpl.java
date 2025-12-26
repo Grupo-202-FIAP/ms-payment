@@ -39,12 +39,12 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
 
 
         if (signature == null) {
-            logger.error("[Webhook] Signature header is missing");
+            logger.error("[WEBHOOK] Signature header is missing");
             throw new NotificationValidationException("Signature header is missing");
         }
         /*
         if (!mercadoPagoWebhookSignatureValidator.verifySignatureOfProvider(signature, requestId, dataIdParam)) {
-            logger.error("[Webhook] Invalid signature for webhook event: {}", event);
+            logger.error("[WEBHOOK] Invalid signature for webhook event: {}", event);
             throw new NotificationValidationException("Invalid signature for webhook event");
         }
         */
@@ -54,7 +54,7 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
         final Optional<Payment> paymentOptional = paymentRepositoryPort.findByOrderId(UUID.fromString(externalReference));
 
         if (paymentOptional.isEmpty()) {
-            logger.warn("[Webhook] No payment found for Order ID: {}. Ignoring event.", externalReference);
+            logger.warn("[WEBHOOK] No payment found for Order ID: {}. Ignoring event.", externalReference);
             return;
         }
 
@@ -68,12 +68,12 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
                 handlePaymentExpired(payment);
                 break;
             default:
-                logger.info("[Webhook] Action '{}' ignored for order: {}", event.getAction(), externalReference);
+                logger.info("[WEBHOOK] Action '{}' ignored for order: {}", event.getAction(), externalReference);
         }
     }
 
     private void handlePaymentSuccess(Payment payment) {
-        logger.info("[Webhook] Processing success for order: {}", payment.getOrderId());
+        logger.info("[WEBHOOK] Processing success for order: {}", payment.getOrderId());
         payment.setStatus(PaymentStatus.PROCESSED);
 
         paymentRepositoryPort.save(payment);
@@ -82,7 +82,7 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
     }
 
     private void handlePaymentExpired(Payment payment) {
-        logger.info("[Webhook] Processing expiration for order: {}", payment.getOrderId());
+        logger.info("[WEBHOOK] Processing expiration for order: {}", payment.getOrderId());
         payment.setStatus(PaymentStatus.EXPIRED);
 
         paymentRepositoryPort.save(payment);

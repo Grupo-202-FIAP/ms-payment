@@ -65,6 +65,6 @@ public class MercadoPagoWebhookSignatureValidator {
         return value == null || value.trim().isEmpty();
     }
     */
-    
+
 }
 

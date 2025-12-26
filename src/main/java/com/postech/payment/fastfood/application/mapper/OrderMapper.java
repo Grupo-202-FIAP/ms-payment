@@ -51,7 +51,7 @@ public class OrderMapper {
                 .total_amount(payment.getAmount().toString())
                 .description("Pedido FastFood - " + payment.getOrderId())
                 .external_reference(payment.getOrderId().toString())
-                .expiration_time("PT1M") // 2 horas expiração PT2H
+                .expiration_time("PT10M") // 2 horas expiração PT2H
                 .config(config)
                 .transactions(transactionsDto)
                 .items(items)

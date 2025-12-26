@@ -13,8 +13,8 @@ import tools.jackson.databind.ObjectMapper;
 @AllArgsConstructor
 public class JsonConverter {
 
-    private static final String ERROR_CONVERT_JSON = "[toEvent] Falha para converter JSON para Event: {}";
-    private static final String ERROR_CONVERT_OBJ = "[toJson] Falha para converter objeto para JSON: {}";
+    private static final String ERROR_CONVERT_JSON = "[JsonConverter][ERROR] Failed to convert JSON to Event: {}";
+    private static final String ERROR_CONVERT_OBJ = "[JsonConverter][ERROR] Failed to convert object to JSON: {}";
 
     private final ObjectMapper objectMapper;
     private final LoggerPort logger;
@@ -22,9 +22,9 @@ public class JsonConverter {
     public String toJson(Object object) {
         try {
             return objectMapper.writeValueAsString(object);
-        } catch (JacksonException e) { // Resolvendo IllegalCatch: Usando exceção específica
+        } catch (JacksonException e) {
             logger.error(ERROR_CONVERT_OBJ, e.getMessage());
-            throw new ConversionException("Falha na serialização do objeto", e);
+            throw new ConversionException("Failed to serialize object", e);
         }
     }
 
@@ -33,7 +33,7 @@ public class JsonConverter {
             return objectMapper.readValue(json, EventPayment.class);
         } catch (JacksonException e) {
             logger.error(ERROR_CONVERT_JSON, e.getMessage());
-            throw new ConversionException("Falha na desserialização do EventPayment", e);
+            throw new ConversionException("Failed to deserialize EventPayment", e);
         }
     }
 
@@ -42,7 +42,7 @@ public class JsonConverter {
             return objectMapper.readValue(json, EventOrder.class);
         } catch (JacksonException e) {
             logger.error(ERROR_CONVERT_JSON, e.getMessage());
-            throw new ConversionException("Falha na desserialização do EventOrder", e);
+            throw new ConversionException("Failed to deserialize EventOrder", e);
         }
     }
 }

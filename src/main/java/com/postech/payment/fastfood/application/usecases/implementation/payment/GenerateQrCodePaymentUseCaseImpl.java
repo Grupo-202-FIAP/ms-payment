@@ -39,8 +39,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
 
     @Override
     public void execute(Order order) {
-        logger.info("[Payment] Processando pagamento SQS para o pedido: {}", order.getId());
-
+        logger.info("[PAYMENT][SQS] Processing SQS payment for order: {}", order.getId());
         findExistingQrCode(order.getId())
                 .ifPresentOrElse(
                         this::handleExistingQrCode,
@@ -50,12 +49,12 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
 
     private void handleExistingQrCode(Payment payment) {
         if (isExpired(payment.getQrCode())) {
-            logger.warn("[Payment] QR Code expirado para o pedido: {}", payment.getOrderId());
+            logger.warn("[PAYMENT][SQS] QR Code expired for order: {}", payment.getOrderId());
             updatePaymentStatus(payment, PaymentStatus.EXPIRED);
             final EventPayment eventPayment = buildEvent(payment);
             publishEventPaymentStatusPort.publish(eventPayment);
         }
-        logger.info("[Payment] QR Code válido já existe para o pedido: {}", payment.getOrderId());
+        logger.info("[PAYMENT][SQS] A valid QR Code already exists for order: {}", payment.getOrderId());
     }
 
     private void createNewPayment(Order order) {

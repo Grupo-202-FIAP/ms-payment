@@ -23,19 +23,19 @@ public class ConsumerPaymentQueue {
     //payment-queue
     public void consumeMessage(String payload) {
         try {
-            logger.info("[consumeMessage] Consumindo mensagem da fila de payment-queue");
-            
+            logger.info("[CONSUMER][SQS] Consuming message from payment-queue");
+
             final var event = jsonConverter.toEventOrder(payload);
 
             generateQrCodePaymentUseCase.execute(event.getPayload());
 
-            logger.info("[consumeMessage] Mensagem processada: {}", event.getId());
+            logger.info("[CONSUMER][SQS] Message processed: {}", event.getId());
 
         } catch (ConversionException e) {
-            logger.error("[consumeMessage] Mensagem ignorada por erro de conversão: {}", e.getMessage());
+            logger.error("[CONSUMER][SQS] Message ignored due to conversion error: {}", e.getMessage());
 
         } catch (DatabaseException | PaymentIntegrationException | MessagingException e) {
-            logger.error("[consumeMessage] Erro processável, tentando novamente: {}", e.getMessage());
+            logger.error("[CONSUMER][SQS] Processable error, will retry: {}", e.getMessage());
             throw e;
         }
     }

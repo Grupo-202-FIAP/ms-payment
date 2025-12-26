@@ -1,6 +1,7 @@
 package com.postech.payment.fastfood.application.exception;
 
 public class PaymentIntegrationException extends RuntimeException {
+
     public PaymentIntegrationException(String message) {
         super(message);
     }

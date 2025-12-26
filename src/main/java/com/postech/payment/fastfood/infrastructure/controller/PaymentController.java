@@ -16,11 +16,9 @@ import java.util.UUID;
 public class PaymentController {
 
     private final FindPaymentByOrderIdUseCase findPaymentByOrderIdUseCase;
-    private final LoggerPort logger;
 
     public PaymentController(FindPaymentByOrderIdUseCase findPaymentByOrderIdUseCase, LoggerPort logger) {
         this.findPaymentByOrderIdUseCase = findPaymentByOrderIdUseCase;
-        this.logger = logger;
     }
 
     @GetMapping("{orderId}")

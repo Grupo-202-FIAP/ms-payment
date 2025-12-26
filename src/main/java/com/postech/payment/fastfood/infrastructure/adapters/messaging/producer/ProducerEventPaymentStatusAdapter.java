@@ -24,15 +24,15 @@ public class ProducerEventPaymentStatusAdapter implements PublishEventPaymentSta
     @Override
     public void publish(Object message) {
         try {
-            logger.info("[Adapter][SNS] Publicando evento no tópico: {}", topicArn);
+            logger.info("[ADAPTER][SNS] Publishing event to topic: {}", topicArn);
             snsTemplate.convertAndSend(topicArn, message);
         } catch (SnsException e) {
-            logger.error("[Adapter][SNS] Erro no serviço SNS para o tópico: {}", topicArn, e);
-            throw new MessagingException("Falha no serviço de mensageria", e);
+            logger.error("[ADAPTER][SNS] SNS service error for topic: {}", topicArn, e);
+            throw new MessagingException("Messaging service failure", e);
 
         } catch (SdkClientException e) {
-            logger.error("[Adapter][SNS] Erro de conectividade com AWS SNS: {}", topicArn, e);
-            throw new MessagingException("Falha de conexão com provedor de mensagens", e);
+            logger.error("[ADAPTER][SNS] AWS SNS connectivity error: {}", topicArn, e);
+            throw new MessagingException("Connection failure with message provider", e);
         }
     }
 }
