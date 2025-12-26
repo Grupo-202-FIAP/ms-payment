@@ -1,7 +1,7 @@
 package com.postech.payment.fastfood.application.config;
 
 
-import com.postech.payment.fastfood.domain.exception.FastFoodException;
+import com.postech.payment.fastfood.application.exception.FastFoodException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;

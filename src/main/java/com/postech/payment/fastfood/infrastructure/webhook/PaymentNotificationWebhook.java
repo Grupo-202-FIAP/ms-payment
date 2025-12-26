@@ -7,7 +7,12 @@ import com.postech.payment.fastfood.infrastructure.webhook.dao.WebhookEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -42,7 +47,7 @@ public class PaymentNotificationWebhook {
         logger.info("[Webhook][Payment][DEBUG] x-signature: '{}'", signature);
         logger.info("[Webhook][Payment][DEBUG] x-request-id: '{}'", requestId);
 
-        String finalDataId = dataIdParam != null ? dataIdParam : idParam;
+        final String finalDataId = dataIdParam != null ? dataIdParam : idParam;
 
         if (finalDataId == null) {
             logger.error("[Webhook][Payment] ERROR: No 'data.id' or 'id' parameter found!");

@@ -26,7 +26,7 @@ public class QrCodeMapper {
             return null;
         }
 
-        QrCode.Builder builder = new QrCode.Builder()
+        final QrCode.Builder builder = new QrCode.Builder()
                 .id(qrCodeEntity.getId())
                 .orderId(qrCodeEntity.getOrderId())
                 .totalAmount(qrCodeEntity.getTotalAmount())
@@ -35,7 +35,7 @@ public class QrCodeMapper {
                 .expiresAt(qrCodeEntity.getExpiresAt());
 
         if (qrCodeEntity.getPayment() != null) {
-            PaymentEntity paymentEntity = qrCodeEntity.getPayment();
+            final PaymentEntity paymentEntity = qrCodeEntity.getPayment();
             builder.payment(
                     new Payment.Builder()
                             .id(paymentEntity.getId())

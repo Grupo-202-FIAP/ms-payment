@@ -1,4 +1,4 @@
-package com.postech.payment.fastfood.domain.exception;
+package com.postech.payment.fastfood.application.exception;
 
 public class BusinessException extends RuntimeException {
     private final String errorCode;

@@ -1,18 +1,16 @@
 package com.postech.payment.fastfood.application.usecases.implementation.payment;
 
 
+import com.postech.payment.fastfood.application.exception.NotificationValidationException;
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.PaymentRepositoryPort;
 import com.postech.payment.fastfood.application.gateways.PublishEventPaymentStatusPort;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.ProcessPaymentNotificationUseCase;
 import com.postech.payment.fastfood.domain.Payment;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
-import com.postech.payment.fastfood.domain.exception.FastFoodException;
 import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventPayment;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import com.postech.payment.fastfood.infrastructure.webhook.dao.WebhookEvent;
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,60 +37,69 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
     @Override
     public void execute(WebhookEvent event, String signature, String requestId, String dataIdParam) {
 
+
         if (signature == null) {
-            logger.error("[Webhook][Payment] Signature header is missing in the webhook event: {}", event);
-            throw new FastFoodException("Signature header is missing in the webhook event", "Signature Header Missing", HttpStatus.BAD_REQUEST);
+            logger.error("[Webhook] Signature header is missing");
+            throw new NotificationValidationException("Signature header is missing");
+        }
+        /*
+        if (!mercadoPagoWebhookSignatureValidator.verifySignatureOfProvider(signature, requestId, dataIdParam)) {
+            logger.error("[Webhook] Invalid signature for webhook event: {}", event);
+            throw new NotificationValidationException("Invalid signature for webhook event");
+        }
+        */
+
+
+        final String externalReference = event.getData().getExternalReference();
+        final Optional<Payment> paymentOptional = paymentRepositoryPort.findByOrderId(UUID.fromString(externalReference));
+
+        if (paymentOptional.isEmpty()) {
+            logger.warn("[Webhook] No payment found for Order ID: {}. Ignoring event.", externalReference);
+            return;
         }
 
-//        if (!mercadoPagoWebhookSignatureValidator.verifySignatureOfProvider(signature, requestId, dataIdParam)) {
-//            logger.error("[Webhook][Payment] Invalid signature for webhook event: {}", event);
-//            throw new FastFoodException("Invalid signature for webhook event", "Invalid Signature", HttpStatus.UNAUTHORIZED);
-//        }
+        final Payment payment = paymentOptional.get();
 
-        final Optional<Payment> payment = paymentRepositoryPort.findByOrderId(UUID.fromString(event.getData().getExternalReference()));
-
-        if (payment.isEmpty()) {
-            logger.warn("[Webhook][Payment] No order found for webhook event: {}", event);
-            throw new FastFoodException("No order found for webhook event", "Order Not Found", HttpStatus.NOT_FOUND);
-        }
         switch (event.getAction()) {
             case "order.processed":
-                processOrderSucess(payment.get());
+                handlePaymentSuccess(payment);
                 break;
             case "order.expired":
-                processOrderExpired(payment.get());
+                handlePaymentExpired(payment);
                 break;
             default:
-                logger.warn("[Webhook][Payment] Unknown action '{}' for webhook event: {}", event.getAction(), event);
+                logger.info("[Webhook] Action '{}' ignored for order: {}", event.getAction(), externalReference);
         }
     }
 
-    private void processOrderExpired(Payment expiredPayment) {
-        logger.info("[Webhook][Payment] Payment expired for webhook order: {}", expiredPayment);
-        expiredPayment.setStatus(PaymentStatus.EXPIRED);
-        paymentRepositoryPort.save(expiredPayment);
-        final EventPayment event = buildEvent(expiredPayment);
-        publishEventPaymentStatusPort.publish(event);
-        logger.info("[Webhook][Payment] Payment updated to cancelled status:: {}", expiredPayment.getId());
+    private void handlePaymentSuccess(Payment payment) {
+        logger.info("[Webhook] Processing success for order: {}", payment.getOrderId());
+        payment.setStatus(PaymentStatus.PROCESSED);
+
+        paymentRepositoryPort.save(payment);
+
+        publishEventPaymentStatusPort.publish(buildEvent(payment));
     }
 
-    private void processOrderSucess(Payment payment) {
-        payment.setStatus(PaymentStatus.PROCESSED);
+    private void handlePaymentExpired(Payment payment) {
+        logger.info("[Webhook] Processing expiration for order: {}", payment.getOrderId());
+        payment.setStatus(PaymentStatus.EXPIRED);
+
         paymentRepositoryPort.save(payment);
-        final EventPayment event = buildEvent(payment);
-        publishEventPaymentStatusPort.publish(event);
-        logger.info("[Webhook][Payment] Payment updated to authorized status: {}", payment);
+
+        publishEventPaymentStatusPort.publish(buildEvent(payment));
     }
 
     private EventPayment buildEvent(Payment payment) {
         return EventPayment.builder()
                 .id(UUID.randomUUID())
                 .source("payment-service")
-                .status("status")
+                .status(payment.getStatus().name())
                 .orderId(payment.getOrderId())
                 .payload(payment)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
-
 }
+
+

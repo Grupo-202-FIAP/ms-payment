@@ -14,7 +14,6 @@ import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventPayment;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.GeneratedQrCodeResponse;
-
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -53,22 +52,17 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         if (isExpired(payment.getQrCode())) {
             logger.warn("[Payment] QR Code expirado para o pedido: {}", payment.getOrderId());
             updatePaymentStatus(payment, PaymentStatus.EXPIRED);
-            EventPayment eventPayment = buildEvent(payment);
+            final EventPayment eventPayment = buildEvent(payment);
             publishEventPaymentStatusPort.publish(eventPayment);
         }
         logger.info("[Payment] QR Code válido já existe para o pedido: {}", payment.getOrderId());
     }
 
     private void createNewPayment(Order order) {
-        try {
-            Payment payment = buildInitialPayment(order);
-            GeneratedQrCodeResponse response = mercadoPagoPort.createQrCode(payment, order.getItems());
-            payment.setQrCode(QrCodeMapper.toDomain(response));
-            savePayment(payment);
-        } catch (Exception e) {
-            logger.error("[Payment] Falha na integração para o pedido: {}", order.getId());
-            throw new RuntimeException("Falha ao gerar QR Code externo", e);
-        }
+        final Payment payment = buildInitialPayment(order);
+        final GeneratedQrCodeResponse response = mercadoPagoPort.createQrCode(payment, order.getItems());
+        payment.setQrCode(QrCodeMapper.toDomain(response));
+        savePayment(payment);
     }
 
     private void updatePaymentStatus(Payment payment, PaymentStatus status) {
@@ -94,12 +88,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     private void savePayment(Payment payment) {
-        try {
-            paymentRepositoryPort.save(payment);
-        } catch (Exception e) {
-            logger.error("[Payment] Erro de banco para o pedido: {}", payment.getOrderId());
-            throw new RuntimeException("Erro de persistência de dados", e);
-        }
+        paymentRepositoryPort.save(payment);
     }
 
     private EventPayment buildEvent(Payment payment) {

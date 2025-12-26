@@ -7,8 +7,11 @@ import com.postech.payment.fastfood.domain.Product;
 import com.postech.payment.fastfood.domain.enums.Category;
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
-import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.*;
-
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.OrderItemMP;
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.OrderResponse;
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.QrConfig;
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.QrProperty;
+import com.postech.payment.fastfood.infrastructure.controller.dto.response.mercadopago.TypeResponse;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;

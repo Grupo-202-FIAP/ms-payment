@@ -1,5 +1,6 @@
 package com.postech.payment.fastfood.infrastructure.adapters.http;
 
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.MercadoPagoPort;
 import com.postech.payment.fastfood.application.mapper.OrderMapper;
@@ -13,7 +14,6 @@ import feign.FeignException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -45,22 +45,21 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
         final OrderMPRequestDto requestBody = OrderMapper.toMPVOrderRequest(payment, items, externalPosId, "dynamic");
 
         try {
-            OrderResponse response = mercadoPagoClient.createOrder(
-                    UUID.randomUUID().toString(), // Idempotency Key FOR TESTING PURPOSES CHANGE LATER
+            final OrderResponse response = mercadoPagoClient.createOrder(
+                    UUID.randomUUID().toString(),
                     authHeader,
                     requestBody
             );
 
             return mapToGeneratedQrCodeResponse(payment, response);
 
+        } catch (feign.RetryableException e) {
+            logger.error("[Adapter][MercadoPago] Erro de conectividade com a API para o pedido: {}", payment.getOrderId());
+            throw new PaymentIntegrationException("Serviço de pagamento temporariamente indisponível", e);
+
         } catch (FeignException e) {
             handleFeignException(payment, e);
-            throw e; // Unreachable code, mas mantém a estrutura
-        } catch (Exception e) {
-            logger.error("[Adapter][MercadoPago] Erro inesperado ao processar pedido {}: {}", payment.getOrderId(), e.getMessage());
-            throw new RuntimeException(
-                    "Erro interno ao processar integração de pagamento: " + payment.getOrderId(), e
-            );
+            return null;
         }
     }
 
@@ -78,19 +77,19 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
     }
 
     private void handleFeignException(Payment payment, FeignException e) {
-        HttpStatus status = HttpStatus.resolve(e.status());
-        String errorDetails = e.contentUTF8();
+        final HttpStatus status = HttpStatus.resolve(e.status());
+        final String errorDetails = e.contentUTF8();
 
         logger.warn("[Adapter][MercadoPago] Falha na API externa. Status: {} | Detalhes: {} | Pedido: {}",
                 status, errorDetails, payment.getOrderId());
 
         if (status != null && status.is4xxClientError()) {
-            throw new RuntimeException(
+            throw new PaymentIntegrationException(
                     "Dados de pagamento inválidos na integração para o pedido: " + payment.getOrderId(), e
             );
         }
 
-        throw new RuntimeException(
+        throw new PaymentIntegrationException(
                 "Serviço de pagamento temporariamente indisponível para o pedido: " + payment.getOrderId(), e
         );
     }

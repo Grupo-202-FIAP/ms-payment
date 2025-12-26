@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.UUID;
 
 @RestController
@@ -26,7 +25,7 @@ public class PaymentController {
 
     @GetMapping("{orderId}")
     public ResponseEntity<PaymentResponse> findPaymentByOrderId(@PathVariable UUID orderId) {
-        PaymentResponse payment = PaymentMapper.toResponse(findPaymentByOrderIdUseCase.findPaymentByOrderId(orderId));
+        final PaymentResponse payment = PaymentMapper.toResponse(findPaymentByOrderIdUseCase.findPaymentByOrderId(orderId));
         return ResponseEntity.ok(payment);
     }
 

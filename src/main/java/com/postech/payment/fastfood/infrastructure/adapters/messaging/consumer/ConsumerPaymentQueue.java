@@ -1,10 +1,14 @@
 package com.postech.payment.fastfood.infrastructure.adapters.messaging.consumer;
 
+import com.postech.payment.fastfood.application.exception.ConversionException;
+import com.postech.payment.fastfood.application.exception.DatabaseException;
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.utils.JsonConverter;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.AllArgsConstructor;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,14 +23,20 @@ public class ConsumerPaymentQueue {
     //payment-queue
     public void consumeMessage(String payload) {
         try {
-            logger.info("[consumeMessage] Consumindo mensagem da fila de payment-queue: ");
-            var event = jsonConverter.toEventOrder(payload);
-            generateQrCodePaymentUseCase.execute(event.getPayload());
-            logger.info("[consumeMessage] Mensagem consumida da fila de payment-queue: {}", event.getId());
-        } catch (Exception e) {
-            logger.error("[consumeMessage] Erro ao consumir mensagem da fila de payment-queue com a mensagem: {}", e.getMessage());
+            logger.info("[consumeMessage] Consumindo mensagem da fila de payment-queue");
+            
+            final var event = jsonConverter.toEventOrder(payload);
 
+            generateQrCodePaymentUseCase.execute(event.getPayload());
+
+            logger.info("[consumeMessage] Mensagem processada: {}", event.getId());
+
+        } catch (ConversionException e) {
+            logger.error("[consumeMessage] Mensagem ignorada por erro de conversão: {}", e.getMessage());
+
+        } catch (DatabaseException | PaymentIntegrationException | MessagingException e) {
+            logger.error("[consumeMessage] Erro processável, tentando novamente: {}", e.getMessage());
+            throw e;
         }
     }
-
 }

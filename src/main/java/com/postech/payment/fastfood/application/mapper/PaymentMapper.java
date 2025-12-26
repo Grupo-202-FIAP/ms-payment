@@ -28,9 +28,11 @@ public class PaymentMapper {
     }
 
     public static PaymentEntity toEntity(Payment payment) {
-        if (payment == null) return null;
+        if (payment == null) {
+            return null;
+        }
 
-        PaymentEntity entity = PaymentEntity.builder()
+        final PaymentEntity entity = PaymentEntity.builder()
                 .id(payment.getId())
                 .status(payment.getStatus())
                 .paymentMethod(payment.getPaymentMethod())
@@ -40,7 +42,7 @@ public class PaymentMapper {
                 .build();
 
         if (payment.getQrCode() != null) {
-            QrCodeEntity qrCodeEntity = QrCodeMapper.toEntity(payment.getQrCode());
+            final QrCodeEntity qrCodeEntity = QrCodeMapper.toEntity(payment.getQrCode());
             qrCodeEntity.setPayment(entity);
             entity.setQrCode(qrCodeEntity);
         }
@@ -55,7 +57,7 @@ public class PaymentMapper {
 
         QrCodeResponse qrCodeResponse = null;
         if (payment.getQrCode() != null) {
-            QrCode qrCode = payment.getQrCode();
+            final QrCode qrCode = payment.getQrCode();
             qrCodeResponse = new QrCodeResponse(
                     qrCode.getId(),
                     qrCode.getOrderId(),
