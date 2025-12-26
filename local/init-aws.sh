@@ -1,44 +1,59 @@
-#!/bin/bash
-
-echo "########### Criando recursos no LocalStack ###########"
-
-set -e
-
-echo "########### Criando filas SQS no LocalStack ###########"
+#!/bin/sh
+set -x
 
 AWS_REGION="us-east-1"
 ENDPOINT_URL="http://localhost:4566"
-ORDER_QUEUE_NAME="order-queue"
-ORDER_CALLBACK_QUEUE_NAME="order-callback-queue"
 
+PAYMENT_QUEUE_NAME="payment-queue"
+PAYMENT_CALLBACK_QUEUE_NAME="payment-callback-queue"
+PAYMENT_TOPIC_NAME="payment-callback"
+
+echo "### Criando filas SQS ###"
+
+# Criando a fila que seu MS consome
 aws --endpoint-url=${ENDPOINT_URL} sqs create-queue \
-    --queue-name ${ORDER_QUEUE_NAME} \
-    --region ${AWS_REGION}
+  --queue-name ${PAYMENT_QUEUE_NAME} \
+  --region ${AWS_REGION}
 
-echo "Fila criada: ${ORDER_QUEUE_NAME}"
-
+# Criando a fila de callback
 aws --endpoint-url=${ENDPOINT_URL} sqs create-queue \
-    --queue-name ${ORDER_CALLBACK_QUEUE_NAME} \
-    --region ${AWS_REGION}
+  --queue-name ${PAYMENT_CALLBACK_QUEUE_NAME} \
+  --region ${AWS_REGION}
 
-echo "Fila criada: ${ORDER_CALLBACK_QUEUE_NAME}"
+# Capturando ARNs
+CALLBACK_QUEUE_ARN="arn:aws:sqs:${AWS_REGION}:000000000000:${PAYMENT_CALLBACK_QUEUE_NAME}"
 
-echo "########### Filas criadas com sucesso ###########"
+echo "### Criando tópico SNS ###"
+TOPIC_ARN=$(aws --endpoint-url=${ENDPOINT_URL} sns create-topic \
+  --name ${PAYMENT_TOPIC_NAME} \
+  --query TopicArn --output text)
 
-echo "########### Listando filas SQS ###########"
-aws --endpoint-url=http://localhost:4566 sqs list-queues --region us-east-1
+echo "### Configurando policy da fila CALLBACK ###"
+# A correção principal: usamos aspas simples '' em volta do JSON
+POLICY='{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": "sqs:SendMessage",
+    "Resource": "'$CALLBACK_QUEUE_ARN'",
+    "Condition": {
+      "ArnEquals": {
+        "aws:SourceArn": "'$TOPIC_ARN'"
+      }
+    }
+  }]
+}'
 
-# 2. Criar o tópico SNS payment-callback (onde o ms-payment publica o resultado)
-    aws --endpoint-url=http://localhost:4566 sns create-topic \
-        --name payment-callback \
-        --region us-east-1
+aws --endpoint-url=${ENDPOINT_URL} sqs set-queue-attributes \
+  --queue-url ${ENDPOINT_URL}/000000000000/${PAYMENT_CALLBACK_QUEUE_NAME} \
+  --attributes Policy="$POLICY"
 
+echo "### Inscrevendo SQS no SNS ###"
+aws --endpoint-url=${ENDPOINT_URL} sns subscribe \
+  --topic-arn ${TOPIC_ARN} \
+  --protocol sqs \
+  --notification-endpoint ${CALLBACK_QUEUE_ARN}
 
-# 4. Inscrever a fila do Orquestrador no tópico SNS
-# Isso garante que quando o ms-payment avisar o SNS, o Orquestrador receba a mensagem.
-aws --endpoint-url=http://localhost:4566 sns subscribe \
-    --topic-arn arn:aws:sns:us-east-1:000000000000:payment-callback \
-    --protocol sqs \
-    --notification-endpoint arn:aws:sqs:us-east-1:000000000000:orchestrator-callback-queue
-
-echo "########### Recursos criados com sucesso ###########"
+echo "########### Recursos finais criados ###########"
+aws --endpoint-url=${ENDPOINT_URL} sqs list-queues

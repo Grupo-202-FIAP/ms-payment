@@ -1,6 +1,7 @@
 package com.postech.payment.fastfood.domain;
 
 import com.postech.payment.fastfood.domain.enums.OrderStatus;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -11,17 +12,17 @@ public class Order {
     private String identifier;
     private BigDecimal totalPrice;
     private Payment payment;
-    private List<OrderItem> itens;
+    private List<OrderItem> items;
 
     public Order(
             UUID id,
             String identifier, BigDecimal totalPrice, OrderStatus status, Payment payment,
-            List<OrderItem> itens) {
+            List<OrderItem> items) {
         this.id = id;
         this.identifier = identifier;
         this.totalPrice = totalPrice;
         this.payment = payment;
-        this.itens = itens;
+        this.items = items;
     }
 
     public Order() {
@@ -33,7 +34,7 @@ public class Order {
         this.totalPrice = builder.totalPrice;
 
         this.payment = builder.payment;
-        this.itens = builder.itens;
+        this.items = builder.items;
     }
 
     public UUID getId() {
@@ -60,15 +61,15 @@ public class Order {
         return identifier;
     }
 
-    public List<OrderItem> getItens() {
-        return itens;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
     public static class Builder {
         private UUID id;
         private BigDecimal totalPrice;
         private Payment payment;
-        private List<OrderItem> itens;
+        private List<OrderItem> items;
         private String identifier;
 
         public Builder id(UUID id) {
@@ -85,9 +86,9 @@ public class Order {
             return this;
         }
 
-        public Builder itens(List<OrderItem> itens) {
-            if (itens != null) {
-                this.itens = itens;
+        public Builder items(List<OrderItem> items) {
+            if (items != null) {
+                this.items = items;
             }
             return this;
         }

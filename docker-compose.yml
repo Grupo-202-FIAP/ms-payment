@@ -1,9 +1,8 @@
 version: "3.8"
 services:
 
-
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: postgres
     restart: always
     environment:
@@ -21,31 +20,19 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-    #  mongo:
-    #    image: mongo:latest
-    #    container_name: mongo
-    #    restart: always
-    #    environment:
-    #      MONGO_INITDB_DATABASE: fastfood-payment
-    #      MONGO_INITDB_ROOT_USERNAME: root
-    #      MONGO_INITDB_ROOT_PASSWORD: example
-    #    ports:
-    #      - "27018:27017"
-    #    networks:
-    #      - fastfood
-    #    healthcheck:
-    #      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
-    #      interval: 10s
-    #      timeout: 5s
-    #      retries: 5
-
-    #Configuração do Prometheus
-
+    # --- Resource Limits ---
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'      # Max 50% of 1 CPU core
+          memory: 512M      # Max 512MB RAM
+        reservations:
+          memory: 128M      # Minimum guaranteed 128MB RAM
 
   localstack:
     image: localstack/localstack:latest
     container_name: localstack
+    restart: always
     ports:
       - "4566:4566"
     environment:
@@ -58,7 +45,15 @@ services:
     volumes:
       - "./localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./local/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+      - "./localstack/init:/etc/localstack/init"
+    # --- Resource Limits ---
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'      # Localstack can be intensive, keep an eye on this
+          memory: 1024M     # Max 1GB RAM
+        reservations:
+          memory: 256M
 
 volumes:
   pgdata:

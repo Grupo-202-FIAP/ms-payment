@@ -19,9 +19,31 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    # Configurações do MongoDB
-  mongodb:
-    uri: mongodb://root:example@localhost:27018/fastfood-payment?authSource=admin
+
+  cloud:
+    aws:
+      region:
+        static: us-east-1 # Change to your region
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        queues:
+          process-payment-queue: "http://sqs.us-east-1.localhost.localstack.cloud:4566/000000000000/payment-queue"
+        endpoint: http://localhost:4566
+        region: us-east-1
+      sns:
+        paymentCallbackTopic: "arn:aws:sns:us-east-1:000000000000:payment-callback"
+        endpoint: http://localhost:4566
+        region: us-east-1
+
+
+
+    #sqs:
+    # queues:
+    #  process-payment-queue:#    # Configurações do MongoDB
+#  mongodb:
+#    uri: mongodb://root:example@localhost:27018/fastfood-payment?authSource=admin
 
 
 

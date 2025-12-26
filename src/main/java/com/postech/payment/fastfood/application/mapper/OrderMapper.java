@@ -1,16 +1,10 @@
 package com.postech.payment.fastfood.application.mapper;
 
-
 import com.postech.payment.fastfood.domain.OrderItem;
 import com.postech.payment.fastfood.domain.Payment;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.CategoryIdDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ConfigDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ItemDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMPRequestDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.PaymentDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.QrConfigDto;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.TransactionsDto;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.*;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +46,7 @@ public class OrderMapper {
                 .total_amount(payment.getAmount().toString())
                 .description("Pedido FastFood - " + payment.getOrderId())
                 .external_reference(payment.getOrderId().toString())
-                .expiration_time("PT2H") // 2 horas expiração
+                .expiration_time("PT1M") // 2 horas expiração PT2H
                 .config(config)
                 .transactions(transactionsDto)
                 .items(items)

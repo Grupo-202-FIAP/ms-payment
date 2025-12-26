@@ -3,6 +3,7 @@ package com.postech.payment.fastfood.application.mapper;
 import com.postech.payment.fastfood.domain.Payment;
 import com.postech.payment.fastfood.domain.QrCode;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.GeneratedQrCodeResponse;
+import com.postech.payment.fastfood.infrastructure.persistence.entity.PaymentEntity;
 import com.postech.payment.fastfood.infrastructure.persistence.entity.QrCodeEntity;
 import org.springframework.stereotype.Component;
 
@@ -24,27 +25,31 @@ public class QrCodeMapper {
         if (qrCodeEntity == null) {
             return null;
         }
-        return new QrCode.Builder()
+
+        QrCode.Builder builder = new QrCode.Builder()
                 .id(qrCodeEntity.getId())
                 .orderId(qrCodeEntity.getOrderId())
                 .totalAmount(qrCodeEntity.getTotalAmount())
                 .currency(qrCodeEntity.getCurrency())
-                .payment(
-                        new Payment.Builder()
-                                .id(qrCodeEntity.getPayment().getId())
-                                .orderId(qrCodeEntity.getPayment().getOrderId())
-                                .amount(
-                                        qrCodeEntity.getPayment().getAmount()
-                                )
-                                .status(qrCodeEntity.getPayment().getStatus())
-                                .paymentMethod(qrCodeEntity.getPayment().getPaymentMethod())
-                                .paymentDateTime(qrCodeEntity.getPayment().getPaymentDateTime())
-                                .updatedAt(qrCodeEntity.getPayment().getUpdatedAt())
-                                .build()
-                )
                 .qrCode(qrCodeEntity.getQrCode())
-                .expiresAt(qrCodeEntity.getExpiresAt())
-                .build();
+                .expiresAt(qrCodeEntity.getExpiresAt());
+
+        if (qrCodeEntity.getPayment() != null) {
+            PaymentEntity paymentEntity = qrCodeEntity.getPayment();
+            builder.payment(
+                    new Payment.Builder()
+                            .id(paymentEntity.getId())
+                            .orderId(paymentEntity.getOrderId())
+                            .amount(paymentEntity.getAmount())
+                            .status(paymentEntity.getStatus())
+                            .paymentMethod(paymentEntity.getPaymentMethod())
+                            .paymentDateTime(paymentEntity.getPaymentDateTime())
+                            .updatedAt(paymentEntity.getUpdatedAt())
+                            .build()
+            );
+        }
+
+        return builder.build();
     }
 
     public static QrCodeEntity toEntity(QrCode qrCode) {
@@ -52,6 +57,7 @@ public class QrCodeMapper {
             return null;
         }
         return QrCodeEntity.builder()
+                .id(qrCode.getId())
                 .orderId(qrCode.getOrderId())
                 .totalAmount(qrCode.getTotalAmount())
                 .currency(qrCode.getCurrency())
@@ -60,14 +66,4 @@ public class QrCodeMapper {
                 .build();
     }
 
-    public static GeneratedQrCodeResponse toResponse(QrCode qrCode1) {
-        return new GeneratedQrCodeResponse(
-                qrCode1.getOrderId(),
-                qrCode1.getId().toString(),
-                qrCode1.getTotalAmount(),
-                qrCode1.getCurrency(),
-                qrCode1.getQrCode(),
-                qrCode1.getExpiresAt()
-        );
-    }
 }

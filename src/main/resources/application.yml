@@ -38,4 +38,4 @@ mercadoPago:
   clientSecret: ${CLIENT_SECRET:client-secret}
   externalPosID: ${EXTERNAL_POS_ID:external-pos-id}
   webhook:
-    secretKey: ${WEBHOOK_SECRET:webhook-secret}
+    secretKey: ${WEBHOOK_SECRET:ec2b758697d18e37070779a8ea7531c4ce1aaa7dd1902d57564209464d8fb2fa}

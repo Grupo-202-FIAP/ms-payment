@@ -2,24 +2,11 @@ package com.postech.payment.fastfood.infrastructure.persistence.entity;
 
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,10 +15,9 @@ import java.util.UUID;
 @Table(name = "tb_payment", uniqueConstraints = @UniqueConstraint(columnNames = "orderId"))
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class PaymentEntity {
 
     @Id
@@ -39,9 +25,11 @@ public class PaymentEntity {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
     @CreationTimestamp
@@ -50,6 +38,7 @@ public class PaymentEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
     private BigDecimal amount;
     private UUID orderId;
 

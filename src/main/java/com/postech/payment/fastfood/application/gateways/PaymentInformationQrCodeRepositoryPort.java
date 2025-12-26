@@ -1,7 +1,7 @@
 package com.postech.payment.fastfood.application.gateways;
 
-import com.postech.payment.fastfood.infrastructure.persistence.entity.QrCodeEntity;
+import com.postech.payment.fastfood.domain.QrCode;
 
 public interface PaymentInformationQrCodeRepositoryPort {
-    void save(QrCodeEntity paymentInformationQrCode);
+    void save(QrCode paymentInformationQrCode);
 }

@@ -4,66 +4,112 @@ package com.postech.payment.fastfood.application.usecases.implementation.payment
 import com.postech.payment.fastfood.application.gateways.LoggerPort;
 import com.postech.payment.fastfood.application.gateways.MercadoPagoPort;
 import com.postech.payment.fastfood.application.gateways.PaymentRepositoryPort;
+import com.postech.payment.fastfood.application.gateways.PublishEventPaymentStatusPort;
 import com.postech.payment.fastfood.application.mapper.QrCodeMapper;
 import com.postech.payment.fastfood.application.usecases.interfaces.payment.GenerateQrCodePaymentUseCase;
-import com.postech.payment.fastfood.domain.OrderItem;
+import com.postech.payment.fastfood.domain.Order;
 import com.postech.payment.fastfood.domain.Payment;
 import com.postech.payment.fastfood.domain.QrCode;
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
-import com.postech.payment.fastfood.domain.exception.FastFoodException;
+import com.postech.payment.fastfood.infrastructure.adapters.messaging.dto.EventPayment;
 import com.postech.payment.fastfood.infrastructure.controller.dto.request.GeneratedQrCodeResponse;
-import java.util.List;
-import java.util.UUID;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.util.Optional;
+import java.util.UUID;
 
 public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUseCase {
     private final MercadoPagoPort mercadoPagoPort;
     private final LoggerPort logger;
     private final PaymentRepositoryPort paymentRepositoryPort;
+    private final PublishEventPaymentStatusPort publishEventPaymentStatusPort;
 
-    public GenerateQrCodePaymentUseCaseImpl(MercadoPagoPort mercadoPagoPort, LoggerPort logger, PaymentRepositoryPort paymentRepositoryPort) {
+    public GenerateQrCodePaymentUseCaseImpl(
+            MercadoPagoPort mercadoPagoPort,
+            LoggerPort logger,
+            PaymentRepositoryPort paymentRepositoryPort,
+            PublishEventPaymentStatusPort publishEventPaymentStatusPort
+    ) {
         this.mercadoPagoPort = mercadoPagoPort;
         this.logger = logger;
         this.paymentRepositoryPort = paymentRepositoryPort;
+        this.publishEventPaymentStatusPort = publishEventPaymentStatusPort;
     }
 
-    public GeneratedQrCodeResponse execute(Payment payment, List<OrderItem> itens) {
-        final QrCode existingQrCode = findExistingQrCode(payment);
-        if (existingQrCode != null) {
-            logger.info("[Service][Payment] QR Code já existe para o pedido: {}", payment.getOrderId());
-            checkExpirationQrCode(existingQrCode);
-            return QrCodeMapper.toResponse(existingQrCode);
+    @Override
+    public void execute(Order order) {
+        logger.info("[Payment] Processando pagamento SQS para o pedido: {}", order.getId());
+
+        findExistingQrCode(order.getId())
+                .ifPresentOrElse(
+                        this::handleExistingQrCode,
+                        () -> createNewPayment(order)
+                );
+    }
+
+    private void handleExistingQrCode(Payment payment) {
+        if (isExpired(payment.getQrCode())) {
+            logger.warn("[Payment] QR Code expirado para o pedido: {}", payment.getOrderId());
+            updatePaymentStatus(payment, PaymentStatus.EXPIRED);
+            EventPayment eventPayment = buildEvent(payment);
+            publishEventPaymentStatusPort.publish(eventPayment);
         }
-        logger.info("[Service][Payment] Criando Order no MercadoPago para o pedido: {}", payment.getOrderId());
-        payment.setStatus(PaymentStatus.UNKNOWN);
-        payment.setPaymentMethod(PaymentMethod.QR_CODE);
-        final GeneratedQrCodeResponse qrCode = mercadoPagoPort.createQrCode(payment, itens);
-        payment.setQrCode(QrCodeMapper.toDomain(qrCode));
-        this.paymentRepositoryPort.save(payment);
-        return qrCode;
+        logger.info("[Payment] QR Code válido já existe para o pedido: {}", payment.getOrderId());
     }
 
-    private void checkExpirationQrCode(QrCode qrCode) {
-        if (qrCode.getExpiresAt() != null && qrCode.getExpiresAt().isBefore(java.time.OffsetDateTime.now())) {
-            logger.info("[Service][Payment] QR Code expirado para o pedido: {}", qrCode.getPayment().getOrderId());
-
-            qrCode.getPayment().setStatus(PaymentStatus.EXPIRED);
-
-            paymentRepositoryPort.save(qrCode.getPayment());
-
-            throw new FastFoodException("QR Code expirado para o pedido: " + qrCode.getOrderId(),
-                    "QR Code Expirado",
-                    org.springframework.http.HttpStatus.GONE);
+    private void createNewPayment(Order order) {
+        try {
+            Payment payment = buildInitialPayment(order);
+            GeneratedQrCodeResponse response = mercadoPagoPort.createQrCode(payment, order.getItems());
+            payment.setQrCode(QrCodeMapper.toDomain(response));
+            savePayment(payment);
+        } catch (Exception e) {
+            logger.error("[Payment] Falha na integração para o pedido: {}", order.getId());
+            throw new RuntimeException("Falha ao gerar QR Code externo", e);
         }
-        logger.info("[Service][Payment] QR Code Não Expirado: {}", qrCode.getOrderId());
     }
 
-    private QrCode findExistingQrCode(Payment payment) {
-        final UUID orderId = payment.getOrderId();
-        logger.debug("[Service][Payment] Verificando se já existe um QR Code para o pedido id={}", orderId);
-        return paymentRepositoryPort.findByOrderId(orderId)
-                .map(Payment::getQrCode)
-                .orElse(null);
+    private void updatePaymentStatus(Payment payment, PaymentStatus status) {
+        payment.setStatus(status);
+        paymentRepositoryPort.save(payment);
+    }
+
+    private boolean isExpired(QrCode qrCode) {
+        return qrCode.getExpiresAt() != null && qrCode.getExpiresAt().isBefore(OffsetDateTime.now());
+    }
+
+    private Payment buildInitialPayment(Order order) {
+        return new Payment.Builder()
+                .status(PaymentStatus.PENDING)
+                .paymentMethod(PaymentMethod.QR_CODE)
+                .amount(order.getTotalPrice())
+                .orderId(order.getId())
+                .build();
+    }
+
+    private Optional<Payment> findExistingQrCode(UUID orderId) {
+        return paymentRepositoryPort.findByOrderId(orderId);
+    }
+
+    private void savePayment(Payment payment) {
+        try {
+            paymentRepositoryPort.save(payment);
+        } catch (Exception e) {
+            logger.error("[Payment] Erro de banco para o pedido: {}", payment.getOrderId());
+            throw new RuntimeException("Erro de persistência de dados", e);
+        }
+    }
+
+    private EventPayment buildEvent(Payment payment) {
+        return EventPayment.builder()
+                .id(UUID.randomUUID())
+                .source("payment-service")
+                .status("status")
+                .orderId(payment.getOrderId())
+                .payload(payment)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 }
