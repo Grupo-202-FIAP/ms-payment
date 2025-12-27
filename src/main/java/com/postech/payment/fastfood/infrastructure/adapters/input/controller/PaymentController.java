@@ -1,8 +1,8 @@
 package com.postech.payment.fastfood.infrastructure.adapters.input.controller;
 
 import com.postech.payment.fastfood.application.mapper.PaymentMapper;
+import com.postech.payment.fastfood.application.ports.input.FindPaymentByOrderIdUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import com.postech.payment.fastfood.application.usecases.ports.input.FindPaymentByOrderIdUseCase;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.response.PaymentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

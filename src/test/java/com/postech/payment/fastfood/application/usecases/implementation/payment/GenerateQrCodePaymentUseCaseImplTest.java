@@ -1,7 +1,8 @@
 package com.postech.payment.fastfood.application.usecases.implementation.payment;
 
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import com.postech.payment.fastfood.application.ports.output.MercadoPagoPort;
+import com.postech.payment.fastfood.application.ports.output.PaymentPort;
+import com.postech.payment.fastfood.domain.services.GenerateQrCodePaymentUseCaseImpl;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GenerateQrCodePaymentUseCaseImplTest {
 
     @Mock
-    private MercadoPagoPort mercadoPagoPort;
+    private PaymentPort paymentPort;
 
     @Mock
     private LoggerPort loggerPort;

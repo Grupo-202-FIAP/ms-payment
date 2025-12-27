@@ -3,7 +3,7 @@ package com.postech.payment.fastfood.infrastructure.http;
 import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.mapper.OrderMapper;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import com.postech.payment.fastfood.application.ports.output.MercadoPagoPort;
+import com.postech.payment.fastfood.application.ports.output.PaymentPort;
 import com.postech.payment.fastfood.domain.model.OrderItem;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.request.GeneratedQrCodeResponse;
@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Component
-public class MercadoPagoAdapter implements MercadoPagoPort {
+public class MercadoPagoAdapter implements PaymentPort {
 
     private final MercadoPagoClient mercadoPagoClient;
     private final LoggerPort logger;

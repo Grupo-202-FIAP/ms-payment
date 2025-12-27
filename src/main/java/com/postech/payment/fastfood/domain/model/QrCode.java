@@ -92,6 +92,10 @@ public class QrCode {
         this.expiresAt = expiresAt;
     }
 
+    public Boolean isExpired() {
+        return this.expiresAt != null && this.expiresAt.isBefore(OffsetDateTime.now());
+    }
+
     public static class Builder {
         private UUID id;
         private UUID orderId;
@@ -140,4 +144,5 @@ public class QrCode {
             return new QrCode(this);
         }
     }
+
 }
