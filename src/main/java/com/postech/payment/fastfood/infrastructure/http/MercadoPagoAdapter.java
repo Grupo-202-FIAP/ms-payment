@@ -82,6 +82,11 @@ public class MercadoPagoAdapter implements MercadoPagoPort {
         logger.warn("[ADAPTER][MERCADOPAGO] External API failure. Status: {} | Details: {} | Order: {}",
                 status, errorDetails, payment.getOrderId());
 
+        if (status == HttpStatus.CONFLICT || errorDetails.contains("idempotency_key_already_used")) {
+            logger.error("[ADAPTER][MERCADOPAGO] Idempotency conflict for order {}. Message will be discarded to avoid loop.", payment.getOrderId());
+            return;
+        }
+
         if (status != null && status.is4xxClientError()) {
             throw new PaymentIntegrationException(
                     "Invalid payment data in integration for order: " + payment.getOrderId(), e

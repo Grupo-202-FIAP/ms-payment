@@ -60,8 +60,13 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     private void createNewPayment(Order order) {
         final Payment payment = buildInitialPayment(order);
         final GeneratedQrCodeResponse response = mercadoPagoPort.createQrCode(payment, order.getItems());
-        payment.setQrCode(QrCodeMapper.toDomain(response));
-        savePayment(payment);
+
+        if (response != null) {
+            payment.setQrCode(QrCodeMapper.toDomain(response));
+            savePayment(payment);
+        } else {
+            logger.warn("[PAYMENT][USECASE] Payment creation skipped for order {} due to integration conflict.", order.getId());
+        }
     }
 
     private void updatePaymentStatus(Payment payment, PaymentStatus status) {

@@ -1,6 +1,6 @@
 version: "3.8"
-services:
 
+services:
   db:
     image: postgres:17
     container_name: postgres
@@ -20,14 +20,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    # --- Resource Limits ---
     deploy:
       resources:
         limits:
-          cpus: '0.50'      # Max 50% of 1 CPU core
-          memory: 512M      # Max 512MB RAM
+          cpus: '0.50'
+          memory: 512M
         reservations:
-          memory: 128M      # Minimum guaranteed 128MB RAM
+          memory: 128M
 
   localstack:
     image: localstack/localstack:latest
@@ -36,27 +35,71 @@ services:
     ports:
       - "4566:4566"
     environment:
-      SERVICES: sqs, sns
-      DEBUG: "1"
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_SESSION_TOKEN: test
+      - SERVICES=sqs,sns
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
     volumes:
       - "./localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./localstack/init:/etc/localstack/init"
-    # --- Resource Limits ---
+    networks:
+      - fastfood
     deploy:
       resources:
         limits:
-          cpus: '0.50'      # Localstack can be intensive, keep an eye on this
-          memory: 1024M     # Max 1GB RAM
-        reservations:
-          memory: 256M
+          cpus: '0.50'
+          memory: 1024M
+
+  ms-payment:
+    build: .
+    container_name: ms-payment
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/fastfood-payment
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      # Variáveis do Mercado Pago (Adicione valores de teste ou dummy se necessário)
+      - PUBLIC_KEY=
+      - ACCESS_TOKEN=
+      - CLIENT_ID=
+      - CLIENT_SECRET=
+      - EXTERNAL_POS_ID=
+      - WEBHOOK_SECRET=
+      # Variáveis da AWS / Localstack
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY=test
+      - AWS_SECRET_KEY=test
+      - PAYMENT_QUEUE_NAME=payment-queue
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fastfood
+    ports:
+      - "8084:8084"
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-tunnel
+    restart: always
+    environment:
+      # It's best to put your actual token in a .env file
+      - NGROK_AUTHTOKEN=
+    command:
+      - "http"
+      - "ms-payment:8084"
+    ports:
+      - "4040:4040" # Dashboard: http://localhost:4040
+    networks:
+      - fastfood
+    depends_on:
+      - ms-payment
 
 volumes:
   pgdata:
 
 networks:
   fastfood:
+    driver: bridge
