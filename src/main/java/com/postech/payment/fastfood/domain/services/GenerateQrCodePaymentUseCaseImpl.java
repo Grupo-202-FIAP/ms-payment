@@ -1,37 +1,35 @@
-package com.postech.payment.fastfood.application.usecases.implementation.payment;
+package com.postech.payment.fastfood.domain.services;
 
 
 import com.postech.payment.fastfood.application.mapper.QrCodeMapper;
+import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import com.postech.payment.fastfood.application.ports.output.MercadoPagoPort;
+import com.postech.payment.fastfood.application.ports.output.PaymentPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
 import com.postech.payment.fastfood.application.ports.output.PublishEventPaymentStatusPort;
-import com.postech.payment.fastfood.application.usecases.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.Order;
 import com.postech.payment.fastfood.domain.model.Payment;
-import com.postech.payment.fastfood.domain.model.QrCode;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.request.GeneratedQrCodeResponse;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUseCase {
-    private final MercadoPagoPort mercadoPagoPort;
+    private final PaymentPort paymentPort;
     private final LoggerPort logger;
     private final PaymentRepositoryPort paymentRepositoryPort;
     private final PublishEventPaymentStatusPort publishEventPaymentStatusPort;
 
     public GenerateQrCodePaymentUseCaseImpl(
-            MercadoPagoPort mercadoPagoPort,
+            PaymentPort paymentPort,
             LoggerPort logger,
             PaymentRepositoryPort paymentRepositoryPort,
             PublishEventPaymentStatusPort publishEventPaymentStatusPort
     ) {
-        this.mercadoPagoPort = mercadoPagoPort;
+        this.paymentPort = paymentPort;
         this.logger = logger;
         this.paymentRepositoryPort = paymentRepositoryPort;
         this.publishEventPaymentStatusPort = publishEventPaymentStatusPort;
@@ -39,7 +37,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
 
     @Override
     public void execute(Order order) {
-        logger.info("[PAYMENT][SQS] Processing SQS payment for order: {}", order.getId());
+        logger.info("[Payment][Messaging] Processing payment for order: {}", order.getId());
         findExistingQrCode(order.getId())
                 .ifPresentOrElse(
                         this::handleExistingQrCode,
@@ -48,18 +46,18 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     private void handleExistingQrCode(Payment payment) {
-        if (isExpired(payment.getQrCode())) {
-            logger.warn("[PAYMENT][SQS] QR Code expired for order: {}", payment.getOrderId());
+        if (payment.getQrCode().isExpired()) {
+            logger.warn("[Payment][Messaging] QR Code expired for order: {}", payment.getOrderId());
             updatePaymentStatus(payment, PaymentStatus.EXPIRED);
             final EventPayment eventPayment = buildEvent(payment);
             publishEventPaymentStatusPort.publish(eventPayment);
         }
-        logger.info("[PAYMENT][SQS] A valid QR Code already exists for order: {}", payment.getOrderId());
+        logger.info("[Payment][Messaging] A valid QR Code already exists for order: {}", payment.getOrderId());
     }
 
     private void createNewPayment(Order order) {
         final Payment payment = buildInitialPayment(order);
-        final GeneratedQrCodeResponse response = mercadoPagoPort.createQrCode(payment, order.getItems());
+        final GeneratedQrCodeResponse response = paymentPort.createQrCode(payment, order.getItems());
 
         if (response != null) {
             payment.setQrCode(QrCodeMapper.toDomain(response));
@@ -74,9 +72,6 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         paymentRepositoryPort.save(payment);
     }
 
-    private boolean isExpired(QrCode qrCode) {
-        return qrCode.getExpiresAt() != null && qrCode.getExpiresAt().isBefore(OffsetDateTime.now());
-    }
 
     private Payment buildInitialPayment(Order order) {
         return new Payment.Builder()

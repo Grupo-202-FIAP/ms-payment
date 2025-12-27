@@ -1,9 +1,9 @@
-package com.postech.payment.fastfood.infrastructure.adapters.input.webhook;
+package com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago;
 
 
+import com.postech.payment.fastfood.application.ports.input.ProcessPaymentNotificationUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import com.postech.payment.fastfood.application.usecases.ports.input.ProcessPaymentNotificationUseCase;
-import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.dao.WebhookEvent;
+import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.WebhookEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

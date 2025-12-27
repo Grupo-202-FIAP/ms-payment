@@ -6,6 +6,6 @@ import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.request.GeneratedQrCodeResponse;
 import java.util.List;
 
-public interface MercadoPagoPort {
+public interface PaymentPort {
     GeneratedQrCodeResponse createQrCode(Payment payment, List<OrderItem> items);
 }

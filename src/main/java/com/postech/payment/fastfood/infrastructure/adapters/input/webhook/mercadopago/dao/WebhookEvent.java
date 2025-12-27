@@ -1,4 +1,4 @@
-package com.postech.payment.fastfood.infrastructure.adapters.input.webhook.dao;
+package com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

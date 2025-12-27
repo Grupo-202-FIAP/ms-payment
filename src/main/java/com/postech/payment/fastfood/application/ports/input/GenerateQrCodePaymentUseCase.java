@@ -1,4 +1,4 @@
-package com.postech.payment.fastfood.application.usecases.ports.input;
+package com.postech.payment.fastfood.application.ports.input;
 
 import com.postech.payment.fastfood.domain.model.Order;
 

@@ -1,9 +1,9 @@
-package com.postech.payment.fastfood.application.usecases.implementation.payment;
+package com.postech.payment.fastfood.domain.services;
 
 import com.postech.payment.fastfood.application.exception.FastFoodException;
+import com.postech.payment.fastfood.application.ports.input.FindPaymentByOrderIdUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
-import com.postech.payment.fastfood.application.usecases.ports.input.FindPaymentByOrderIdUseCase;
 import com.postech.payment.fastfood.domain.model.Payment;
 import org.springframework.http.HttpStatus;
 import java.util.Optional;
