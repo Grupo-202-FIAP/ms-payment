@@ -23,4 +23,28 @@ public class EventPayment {
     private String status;
     private List<History> history;
     private LocalDateTime createdAt;
+
+
+    public EventPayment eventExpired(Payment payment) {
+        final History historyEntry = History.builder()
+                .source("PAYMENT")
+                .status(payment.getStatus().name())
+                .message("Status updated to:" + payment.getStatus().name())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+
+        return EventPayment.builder()
+                //TODO: definir transactionId
+                .id(UUID.randomUUID())
+                .source("PAYMENT")
+                .status("ROLLBACK_PENDING")
+                .orderId(payment.getOrderId())
+                .payload(payment)
+                .history(List.of(historyEntry))
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+
 }

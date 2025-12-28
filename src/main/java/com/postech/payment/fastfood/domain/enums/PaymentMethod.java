@@ -12,4 +12,5 @@ public enum PaymentMethod {
     public String getMethod() {
         return method;
     }
+
 }

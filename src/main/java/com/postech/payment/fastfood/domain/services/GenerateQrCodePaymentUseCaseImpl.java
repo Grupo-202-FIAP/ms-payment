@@ -12,8 +12,10 @@ import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.Order;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.request.GeneratedQrCodeResponse;
+import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.History;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,7 +50,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     private void handleExistingQrCode(Payment payment) {
         if (payment.getQrCode().isExpired()) {
             logger.warn("[Payment][Messaging] QR Code expired for order: {}", payment.getOrderId());
-            updatePaymentStatus(payment, PaymentStatus.EXPIRED);
+            updatePaymentStatus(payment, PaymentStatus.CANCELLATION_REQUESTED);
             final EventPayment eventPayment = buildEvent(payment);
             publishEventPaymentStatusPort.publish(eventPayment);
         }
@@ -91,12 +93,21 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     private EventPayment buildEvent(Payment payment) {
+
+        final History historyEntry = History.builder()
+                .source("PAYMENT")
+                .status(payment.getStatus().name())
+                .message("Status atualizado para " + payment.getStatus().name())
+                .createdAt(LocalDateTime.now())
+                .build();
+
         return EventPayment.builder()
                 .id(UUID.randomUUID())
-                .source("payment-service")
-                .status("status")
+                .source("PAYMENT")
+                .status("ROLLBACK_PENDING")
                 .orderId(payment.getOrderId())
                 .payload(payment)
+                .history(List.of(historyEntry))
                 .createdAt(LocalDateTime.now())
                 .build();
     }
