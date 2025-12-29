@@ -1,23 +1,21 @@
 spring:
   application:
     name: ms-payment-fastfood
-
   profiles:
-    default: dev
-
+    active: ${SPRING_PROFILES_ACTIVE:dev}
   jpa:
-    generate-ddl: true
-    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: none # Security best practice: handle via Flyway
 
 management:
   endpoints:
     web:
       exposure:
         include: health, info, prometheus
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+  endpoint:
+    health:
+      show-details: always
 
 springdoc:
   swagger-ui:
@@ -26,16 +24,20 @@ springdoc:
 server:
   port: ${SERVER_PORT:8084}
 
-api:
-  security:
-    token:
-      secret: ${JWT_SECRET:minha-secret}
-
+# Shared Mercado Pago Config
 mercadoPago:
-  publicKey: ${PUBLIC_KEY:public-key}
-  accessToken: ${ACCESS_TOKEN:access-token}
-  clientId: ${CLIENT_ID:client-id}
-  clientSecret: ${CLIENT_SECRET:client-secret}
-  externalPosID: ${EXTERNAL_POS_ID:external-pos-id}
+  publicKey: ${PUBLIC_KEY}
+  accessToken: ${ACCESS_TOKEN}
+  clientId: ${CLIENT_ID}
+  clientSecret: ${CLIENT_SECRET}
+  externalPosID: ${EXTERNAL_POS_ID}
   webhook:
-    secretKey: ${WEBHOOK_SECRET:webhook-secret}
+    secretKey: ${WEBHOOK_SECRET}
+
+cloud:
+  aws:
+    region:
+      static: ${AWS_REGION:us-east-1}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}

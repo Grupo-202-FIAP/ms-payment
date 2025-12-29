@@ -1,8 +1,6 @@
 package com.postech.payment.fastfood.infrastructure.http.mercadopago.security;
 
-
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
-import org.apache.commons.codec.digest.HmacUtils;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,27 +11,60 @@ public class MercadoPagoWebhookSignatureValidator {
 
     @Value("${mercadoPago.webhook.secretKey}")
     private String secretKey;
+    @Value("${mercadoPago.webhook.secretKey}")
+    private String mercadoPagoWebhookSecret;
 
     public MercadoPagoWebhookSignatureValidator(LoggerPort loggerPort) {
         this.loggerPort = loggerPort;
     }
 
-    public Boolean isValid(String idUrl, String xrequestId, String xsignature) {
+  /*
+    public boolean verifySignatureOfProvider(String signature, String xRequestId, String dataId) {
+        if (isEmptyOrNull(signature) || isEmptyOrNull(xRequestId) || isEmptyOrNull(dataId)) {
+            return false;
+        }
 
         try {
-            final String ts = xsignature.split(",")[0].split("=")[1];
-            final String expectedSignature = xsignature.split(",")[1].split("=")[1]; // valor do v1
+            // Faz o split do signature: "ts=123456,v1=hash"
+            final String[] signatureParts = signature.split(",");
+            if (signatureParts.length != 2) {
+                return false;
+            }
 
-            final String signedTemplate = String.format("id:%s;request-id:%s;ts:%s;", idUrl, xrequestId, ts);
+            // Extrai o timestamp
+            final String[] timestampPart = signatureParts[0].split("=");
+            if (timestampPart.length != 2) {
+                return false;
+            }
+            final String valueOfTimestamp = timestampPart[1];
 
-            final String generatedSignature = new HmacUtils("HmacSHA256", secretKey).hmacHex(signedTemplate);
+            // Extrai a assinatura esperada
+            final String[] xSignaturePart = signatureParts[1].split("=");
+            if (xSignaturePart.length != 2) {
+                return false;
+            }
+            final String valueOfXSignature = xSignaturePart[1];
 
-            return generatedSignature.equals(expectedSignature);
+            // Monta o template que será assinado
+            final String signatureTemplateParsed = String.format("id:%s;request-id:%s;ts:%s;",
+                    dataId, xRequestId, valueOfTimestamp);
 
-        } catch (NullPointerException | IllegalArgumentException e) {
-            loggerPort.error("[Webhook][Payment] Error validating signature: {}", e.getMessage());
+            // Gera a assinatura usando HMAC-SHA256
+            final String cyphedSignature = new HmacUtils("HmacSHA256", mercadoPagoWebhookSecret)
+                    .hmacHex(signatureTemplateParsed);
+
+            // Compara as assinaturas
+            return valueOfXSignature.equals(cyphedSignature);
+
+        } catch (Exception e) {
             return false;
         }
     }
 
+    private boolean isEmptyOrNull(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+    */
+
 }
+

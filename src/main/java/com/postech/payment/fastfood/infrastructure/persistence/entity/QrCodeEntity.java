@@ -1,5 +1,6 @@
 package com.postech.payment.fastfood.infrastructure.persistence.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,12 +28,16 @@ public class QrCodeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(nullable = false)
     private UUID orderId;
     @ManyToOne
     @JoinColumn(name = "payment_id")
     private PaymentEntity payment;
+    @Column(nullable = false)
     private BigDecimal totalAmount;
+    @Column(nullable = false)
     private String currency;
+    @Column(nullable = false, length = 2048)
     private String qrCode;
     private OffsetDateTime expiresAt;
 

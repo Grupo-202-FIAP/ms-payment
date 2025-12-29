@@ -1,6 +1,7 @@
 package com.postech.payment.fastfood.infrastructure.adapters.http;
 
-import com.postech.payment.fastfood.application.gateways.LoggerPort;
+import com.postech.payment.fastfood.application.ports.output.LoggerPort;
+import com.postech.payment.fastfood.infrastructure.http.MercadoPagoAdapter;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

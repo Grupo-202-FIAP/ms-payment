@@ -1,9 +1,8 @@
 version: "3.8"
+
 services:
-
-
   db:
-    image: postgres:latest
+    image: postgres:17
     container_name: postgres
     restart: always
     environment:
@@ -21,47 +20,86 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-    #  mongo:
-    #    image: mongo:latest
-    #    container_name: mongo
-    #    restart: always
-    #    environment:
-    #      MONGO_INITDB_DATABASE: fastfood-payment
-    #      MONGO_INITDB_ROOT_USERNAME: root
-    #      MONGO_INITDB_ROOT_PASSWORD: example
-    #    ports:
-    #      - "27018:27017"
-    #    networks:
-    #      - fastfood
-    #    healthcheck:
-    #      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
-    #      interval: 10s
-    #      timeout: 5s
-    #      retries: 5
-
-    #Configuração do Prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
 
 
   localstack:
     image: localstack/localstack:latest
     container_name: localstack
+    restart: always
     ports:
       - "4566:4566"
     environment:
-      SERVICES: sqs, sns
-      DEBUG: "1"
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_SESSION_TOKEN: test
+      - SERVICES=sqs,sns
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
     volumes:
       - "./localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./local/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+      - "./localstack/init:/etc/localstack/init"
+    networks:
+      - fastfood
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+  ms-payment:
+    build: .
+    container_name: ms-payment
+    environment:
+      - SPRING_PROFILES_ACTIVE
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - PUBLIC_KEY
+      - ACCESS_TOKEN
+      - CLIENT_ID
+      - CLIENT_SECRET
+      - EXTERNAL_POS_ID
+      - WEBHOOK_SECRET
+      - AWS_REGION
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - PAYMENT_QUEUE_NAME
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fastfood
+    ports:
+      - "8084:8084"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-tunnel
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN
+    command:
+      - "http"
+      - "ms-payment:8084"
+    ports:
+      - "4040:4040" # Dashboard: http://localhost:4040
+    networks:
+      - fastfood
+    depends_on:
+      - ms-payment
 
 volumes:
   pgdata:
 
 networks:
   fastfood:
+    driver: bridge

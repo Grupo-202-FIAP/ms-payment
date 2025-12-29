@@ -3,6 +3,7 @@ package com.postech.payment.fastfood.infrastructure.persistence.entity;
 import com.postech.payment.fastfood.domain.enums.PaymentMethod;
 import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,10 +29,9 @@ import java.util.UUID;
 @Table(name = "tb_payment", uniqueConstraints = @UniqueConstraint(columnNames = "orderId"))
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class PaymentEntity {
 
     @Id
@@ -39,9 +39,11 @@ public class PaymentEntity {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentStatus status;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentMethod paymentMethod;
 
     @CreationTimestamp
@@ -50,8 +52,12 @@ public class PaymentEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
     private BigDecimal amount;
     private UUID orderId;
+
+    @Column(nullable = false, unique = true)
+    private UUID transactionId;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "qr_code_id")
