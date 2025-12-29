@@ -34,6 +34,7 @@ public class EventPayment {
                 .build();
 
 
+
         return EventPayment.builder()
                 .id(UUID.randomUUID())
                 .transactionId(payment.getTransactionId())
@@ -45,6 +46,7 @@ public class EventPayment {
                 .createdAt(LocalDateTime.now())
                 .build();
     }
+
 
     public EventPayment eventExpiring(Payment payment, UUID transactionId) {
         final History historyEntry = History.builder()
