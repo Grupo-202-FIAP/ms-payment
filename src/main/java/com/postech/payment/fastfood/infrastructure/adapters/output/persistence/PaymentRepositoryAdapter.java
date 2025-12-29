@@ -51,6 +51,12 @@ public class PaymentRepositoryAdapter implements PaymentRepositoryPort {
         return byOrderId.map(PaymentMapperEntity::toDomain);
     }
 
+    @Override
+    @Transactional
+    public void delete(UUID orderId) {
+        paymentEntityRepository.deleteByOrderId(orderId);
+    }
+
     private void bindRelations(PaymentEntity entity) {
         if (entity.getQrCode() != null) {
             entity.getQrCode().setPayment(entity);

@@ -8,4 +8,6 @@ public interface PaymentRepositoryPort {
     void save(Payment payment);
 
     Optional<Payment> findByOrderId(UUID orderId);
+
+    void delete(UUID orderID);
 }

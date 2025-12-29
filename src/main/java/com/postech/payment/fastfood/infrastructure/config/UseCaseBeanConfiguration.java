@@ -3,6 +3,7 @@ package com.postech.payment.fastfood.infrastructure.config;
 import com.postech.payment.fastfood.application.ports.input.FindPaymentByOrderIdUseCase;
 import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.input.ProcessPaymentNotificationUseCase;
+import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
@@ -10,6 +11,7 @@ import com.postech.payment.fastfood.application.ports.output.PublishEventPayment
 import com.postech.payment.fastfood.domain.services.FindPaymentByOrderIdUseCaseImpl;
 import com.postech.payment.fastfood.domain.services.GenerateQrCodePaymentUseCaseImpl;
 import com.postech.payment.fastfood.domain.services.ProcessPaymentNotificationUseCaseImpl;
+import com.postech.payment.fastfood.domain.services.RollbackPaymentUseCaseImpl;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,5 +46,12 @@ public class UseCaseBeanConfiguration {
             LoggerPort loggerPort
     ) {
         return new FindPaymentByOrderIdUseCaseImpl(paymentRepositoryPort, loggerPort);
+    }
+
+    @Bean
+    public RollbackPaymentUseCase rollbackPaymentUseCase (
+            PaymentRepositoryPort paymentRepositoryPort
+    ) {
+        return new RollbackPaymentUseCaseImpl(paymentRepositoryPort);
     }
 }

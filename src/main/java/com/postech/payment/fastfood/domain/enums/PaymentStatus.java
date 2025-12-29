@@ -1,8 +1,8 @@
 package com.postech.payment.fastfood.domain.enums;
 
 public enum PaymentStatus {
-    PROCESSED("PROCESSED"),
     PENDING("PENDING"),
+    PROCESSED("PROCESSED"),
     EXPIRING("EXPIRING"),
     EXPIRED("EXPIRED");
 
