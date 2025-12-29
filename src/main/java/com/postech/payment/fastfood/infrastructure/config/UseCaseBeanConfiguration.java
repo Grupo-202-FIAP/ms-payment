@@ -49,7 +49,7 @@ public class UseCaseBeanConfiguration {
     }
 
     @Bean
-    public RollbackPaymentUseCase rollbackPaymentUseCase (
+    public RollbackPaymentUseCase rollbackPaymentUseCase(
             PaymentRepositoryPort paymentRepositoryPort
     ) {
         return new RollbackPaymentUseCaseImpl(paymentRepositoryPort);

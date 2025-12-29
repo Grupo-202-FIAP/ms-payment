@@ -23,13 +23,15 @@ public class EventPayment {
     private String status;
     private List<History> history;
     private LocalDateTime createdAt;
-
+    private static final String PAYMENT_SOURCE = "PAYMENT";
+    private static final String STATUS_MSG_PREFIX = "Status updated to:";
 
     public EventPayment eventExpired(Payment payment) {
+
         final History historyEntry = History.builder()
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status(payment.getStatus().name())
-                .message("Status updated to:" + payment.getStatus().name())
+                .message(STATUS_MSG_PREFIX + payment.getStatus().name())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -38,7 +40,7 @@ public class EventPayment {
         return EventPayment.builder()
                 .id(UUID.randomUUID())
                 .transactionId(payment.getTransactionId())
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status("FAIL")
                 .orderId(payment.getOrderId())
                 .payload(payment)
@@ -50,9 +52,9 @@ public class EventPayment {
 
     public EventPayment eventExpiring(Payment payment, UUID transactionId) {
         final History historyEntry = History.builder()
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status("ROLLBACK_PENDING")
-                .message("Status updated to:" + payment.getStatus().name())
+                .message(STATUS_MSG_PREFIX + payment.getStatus().name())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -60,7 +62,7 @@ public class EventPayment {
         return EventPayment.builder()
                 .id(UUID.randomUUID())
                 .transactionId(transactionId)
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status("ROLLBACK_PENDING")
                 .orderId(payment.getOrderId())
                 .payload(payment)
@@ -71,10 +73,11 @@ public class EventPayment {
 
 
     public EventPayment eventSuccess(Payment payment) {
+
         final History historyEntry = History.builder()
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status(payment.getStatus().name())
-                .message("Status updated to:" + payment.getStatus().name())
+                .message(STATUS_MSG_PREFIX + payment.getStatus().name())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -82,7 +85,7 @@ public class EventPayment {
         return EventPayment.builder()
                 .id(UUID.randomUUID())
                 .transactionId(payment.getTransactionId())
-                .source("PAYMENT")
+                .source(PAYMENT_SOURCE)
                 .status("SUCCESS")
                 .orderId(payment.getOrderId())
                 .payload(payment)

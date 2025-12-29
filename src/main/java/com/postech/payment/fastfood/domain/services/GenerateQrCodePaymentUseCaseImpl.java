@@ -37,7 +37,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     @Override
     public void execute(Order order, UUID transactionId) {
         logger.info("[Payment][Messaging] Processing payment for order: {}", order.getId());
-        Optional<Payment> existingQrCode = findExistingQrCode(order.getId());
+        final Optional<Payment> existingQrCode = findExistingQrCode(order.getId());
         if (existingQrCode.isPresent()) {
             handleExistingQrCode(existingQrCode.get(),transactionId);
         } else {

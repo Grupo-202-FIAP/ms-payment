@@ -11,7 +11,6 @@ import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.WebhookEvent;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 

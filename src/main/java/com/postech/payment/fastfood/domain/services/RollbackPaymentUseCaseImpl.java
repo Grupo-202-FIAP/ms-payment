@@ -2,7 +2,6 @@ package com.postech.payment.fastfood.domain.services;
 
 import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
-
 import java.util.UUID;
 
 public class RollbackPaymentUseCaseImpl implements RollbackPaymentUseCase {
