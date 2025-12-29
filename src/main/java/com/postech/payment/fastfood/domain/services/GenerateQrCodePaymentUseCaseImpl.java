@@ -39,9 +39,14 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         logger.info("[Payment][Messaging] Processing payment for order: {}", order.getId());
         final Optional<Payment> existingQrCode = findExistingQrCode(order.getId());
         if (existingQrCode.isPresent()) {
-            handleExistingQrCode(existingQrCode.get(),transactionId);
+            final Payment existingPayment = existingQrCode.get();
+            if (existingPayment.getQrCode() == null) {
+                createNewQrCodeForExistingPayment(existingPayment, order, transactionId);
+            } else {
+                handleExistingQrCode(existingPayment, transactionId);
+            }
         } else {
-            createNewPayment(order,transactionId);
+            createNewPayment(order, transactionId);
         }
     }
 
@@ -53,6 +58,16 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
             publishEventPaymentStatusPort.publish(eventPayment);
         }
         logger.info("[Payment][Messaging] A valid QR Code already exists for order: {}", payment.getOrderId());
+    }
+
+    private void createNewQrCodeForExistingPayment(Payment payment, Order order, UUID transactionId) {
+        final GeneratedQrCodeResponse response = paymentPort.createQrCode(payment, order.getItems());
+        if (response != null) {
+            payment.setQrCode(QrCodeMapper.toDomain(response));
+            savePayment(payment);
+        } else {
+            logger.warn("[PAYMENT][USECASE] Payment creation skipped for order {} due to integration conflict.", order.getId());
+        }
     }
 
     private void createNewPayment(Order order, UUID transactionId) {
