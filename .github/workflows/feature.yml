@@ -34,14 +34,14 @@ jobs:
       - name: Checkstyle
         run: mvn checkstyle:check
 
-      #      - name: Build com testes e Jacoco
-      #        run: mvn clean test jacoco:report
-      #
-      #      - name: Upload Jacoco Report
-      #        uses: actions/upload-artifact@v4
-      #        with:
-      #          name: jacoco-report
-      #          path: target/site/jacoco
+      - name: Build com testes e Jacoco
+        run: mvn clean test jacoco:report
+
+      - name: Upload Jacoco Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
 
       - name: Gerar JAR para o Docker
         run: mvn clean package -DskipTests
