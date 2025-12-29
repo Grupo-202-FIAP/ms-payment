@@ -133,7 +133,9 @@ class PaymentMapperEntityTest {
         assertEquals(PaymentStatus.PENDING, result.getStatus());
         assertEquals(PaymentMethod.QR_CODE, result.getPaymentMethod());
         assertEquals(now, result.getPaymentDateTime());
-        assertEquals(now, result.getUpdatedAt());
+        // updatedAt is managed by Hibernate @UpdateTimestamp annotation, 
+        // so it's not mapped in toEntity() and will be null until persisted
+        assertNull(result.getUpdatedAt());
         assertNull(result.getQrCode());
     }
 
