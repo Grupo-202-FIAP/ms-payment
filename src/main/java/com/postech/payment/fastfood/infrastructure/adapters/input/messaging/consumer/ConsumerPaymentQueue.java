@@ -26,7 +26,7 @@ public class ConsumerPaymentQueue {
 
             final var event = jsonConverter.toEventOrder(payload);
 
-            generateQrCodePaymentUseCase.execute(event.getPayload());
+            generateQrCodePaymentUseCase.execute(event.getPayload(),event.getTransactionId());
 
             logger.info("[CONSUMER][SQS] Message processed: {}", event.getId());
 

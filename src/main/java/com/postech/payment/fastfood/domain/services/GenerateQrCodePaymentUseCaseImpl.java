@@ -12,10 +12,7 @@ import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.Order;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.request.GeneratedQrCodeResponse;
-import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.History;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,27 +35,28 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     @Override
-    public void execute(Order order) {
+    public void execute(Order order, UUID transactionId) {
         logger.info("[Payment][Messaging] Processing payment for order: {}", order.getId());
-        findExistingQrCode(order.getId())
-                .ifPresentOrElse(
-                        this::handleExistingQrCode,
-                        () -> createNewPayment(order)
-                );
+        Optional<Payment> existingQrCode = findExistingQrCode(order.getId());
+        if (existingQrCode.isPresent()) {
+            handleExistingQrCode(existingQrCode.get(),transactionId);
+        } else {
+            createNewPayment(order,transactionId);
+        }
     }
 
-    private void handleExistingQrCode(Payment payment) {
+    private void handleExistingQrCode(Payment payment, UUID transactionId) {
         if (payment.getQrCode().isExpired()) {
             logger.warn("[Payment][Messaging] QR Code expired for order: {}", payment.getOrderId());
-            updatePaymentStatus(payment, PaymentStatus.CANCELLATION_REQUESTED);
-            final EventPayment eventPayment = buildEvent(payment);
+            updatePaymentStatus(payment);
+            final EventPayment eventPayment = new EventPayment().eventExpiring(payment, transactionId);
             publishEventPaymentStatusPort.publish(eventPayment);
         }
         logger.info("[Payment][Messaging] A valid QR Code already exists for order: {}", payment.getOrderId());
     }
 
-    private void createNewPayment(Order order) {
-        final Payment payment = buildInitialPayment(order);
+    private void createNewPayment(Order order, UUID transactionId) {
+        final Payment payment = buildInitialPayment(order,transactionId);
         final GeneratedQrCodeResponse response = paymentPort.createQrCode(payment, order.getItems());
 
         if (response != null) {
@@ -69,18 +67,19 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         }
     }
 
-    private void updatePaymentStatus(Payment payment, PaymentStatus status) {
-        payment.setStatus(status);
+    private void updatePaymentStatus(Payment payment) {
+        payment.setStatus(PaymentStatus.EXPIRING);
         paymentRepositoryPort.save(payment);
     }
 
 
-    private Payment buildInitialPayment(Order order) {
+    private Payment buildInitialPayment(Order order,UUID transactionId) {
         return new Payment.Builder()
                 .status(PaymentStatus.PENDING)
                 .paymentMethod(PaymentMethod.QR_CODE)
                 .amount(order.getTotalPrice())
                 .orderId(order.getId())
+                .transactionId(transactionId)
                 .build();
     }
 
@@ -92,23 +91,5 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         paymentRepositoryPort.save(payment);
     }
 
-    private EventPayment buildEvent(Payment payment) {
 
-        final History historyEntry = History.builder()
-                .source("PAYMENT")
-                .status(payment.getStatus().name())
-                .message("Status atualizado para " + payment.getStatus().name())
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        return EventPayment.builder()
-                .id(UUID.randomUUID())
-                .source("PAYMENT")
-                .status("ROLLBACK_PENDING")
-                .orderId(payment.getOrderId())
-                .payload(payment)
-                .history(List.of(historyEntry))
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
 }

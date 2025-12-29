@@ -12,7 +12,7 @@
     <artifactId>ms-payment-fastfood</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ms-payment-fastfood</name>
-    <description>payment microservice</description>
+    <description>payment microservice</description>sudo pacman -Syu maven
     <url/>
     <licenses>
         <license/>

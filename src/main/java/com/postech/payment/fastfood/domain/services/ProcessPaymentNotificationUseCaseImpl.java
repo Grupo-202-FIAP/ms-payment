@@ -75,31 +75,20 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
     private void handlePaymentSuccess(Payment payment) {
         logger.info("[WEBHOOK] Processing success for order: {}", payment.getOrderId());
         payment.setStatus(PaymentStatus.PROCESSED);
-
         paymentRepositoryPort.save(payment);
-
-        publishEventPaymentStatusPort.publish(buildEvent(payment));
+        final EventPayment eventPayment = new EventPayment().eventSuccess(payment);
+        publishEventPaymentStatusPort.publish(eventPayment);
     }
 
     private void handlePaymentExpired(Payment payment) {
         logger.info("[WEBHOOK] Processing expiration for order: {}", payment.getOrderId());
         payment.setStatus(PaymentStatus.EXPIRED);
-
         paymentRepositoryPort.save(payment);
-
-        publishEventPaymentStatusPort.publish(buildEvent(payment));
+        final EventPayment eventPayment = new EventPayment().eventExpired(payment);
+        publishEventPaymentStatusPort.publish(eventPayment);
     }
 
-    private EventPayment buildEvent(Payment payment) {
-        return EventPayment.builder()
-                .id(UUID.randomUUID())
-                .source("payment-service")
-                .status(payment.getStatus().name())
-                .orderId(payment.getOrderId())
-                .payload(payment)
-                .createdAt(LocalDateTime.now())
-                .build();
-    }
+
 }
 
 

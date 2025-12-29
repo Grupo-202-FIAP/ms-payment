@@ -22,6 +22,7 @@ public class PaymentMapperEntity {
                 .amount(paymentEntity.getAmount())
                 .qrCode(QrCodeMapperEntity.toDomain(paymentEntity.getQrCode()))
                 .updatedAt(paymentEntity.getUpdatedAt())
+                .transactionId(paymentEntity.getTransactionId())
                 .build();
     }
 
@@ -37,6 +38,7 @@ public class PaymentMapperEntity {
                 .orderId(payment.getOrderId())
                 .paymentDateTime(payment.getPaymentDateTime())
                 .amount(payment.getAmount())
+                .transactionId(payment.getTransactionId())
                 .build();
 
         if (payment.getQrCode() != null) {

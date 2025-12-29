@@ -56,6 +56,9 @@ public class PaymentEntity {
     private BigDecimal amount;
     private UUID orderId;
 
+    @Column(nullable = false, unique = true)
+    private UUID transactionId;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "qr_code_id")
     private QrCodeEntity qrCode;

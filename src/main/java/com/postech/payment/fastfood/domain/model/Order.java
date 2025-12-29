@@ -16,7 +16,7 @@ public class Order {
     public Order(
             UUID id,
             String identifier, BigDecimal totalPrice, OrderStatus status, Payment payment,
-            List<OrderItem> items) {
+            List<OrderItem> items, UUID transactionId) {
         this.id = id;
         this.identifier = identifier;
         this.totalPrice = totalPrice;
@@ -24,14 +24,10 @@ public class Order {
         this.items = items;
     }
 
-    public Order() {
-    }
-
     public Order(Builder builder) {
         this.id = builder.id;
         this.identifier = builder.identifier;
         this.totalPrice = builder.totalPrice;
-
         this.payment = builder.payment;
         this.items = builder.items;
     }
@@ -63,6 +59,20 @@ public class Order {
     public List<OrderItem> getItems() {
         return items;
     }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
+    }
+
+
 
     public static class Builder {
         private UUID id;
@@ -105,6 +115,7 @@ public class Order {
             }
             return this;
         }
+
 
         public Order build() {
             return new Order(this);

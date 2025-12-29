@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class Payment {
     private UUID id;
+    private UUID transactionId;
     private PaymentStatus status;
     private PaymentMethod paymentMethod;
     private LocalDateTime paymentDateTime;
@@ -45,6 +46,7 @@ public class Payment {
         this.orderId = builder.orderId;
         this.amount = builder.amount;
         this.qrCode = builder.qrCode;
+        this.transactionId = builder.transactionId;
     }
 
     public UUID getId() {
@@ -111,6 +113,14 @@ public class Payment {
         this.qrCode = qrCode;
     }
 
+    public UUID getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(UUID transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public static class Builder {
         private UUID id;
         private PaymentStatus status;
@@ -120,6 +130,7 @@ public class Payment {
         private BigDecimal amount;
         private UUID orderId;
         private QrCode qrCode;
+        private UUID transactionId;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -161,9 +172,15 @@ public class Payment {
             return this;
         }
 
+        public Builder transactionId(UUID transactionId) {
+            this.transactionId = transactionId;
+            return this;
+        }
+
         public Payment build() {
             return new Payment(this);
         }
+
     }
 
 

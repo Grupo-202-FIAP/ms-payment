@@ -35,8 +35,29 @@ public class EventPayment {
 
 
         return EventPayment.builder()
-                //TODO: definir transactionId
                 .id(UUID.randomUUID())
+                .transactionId(payment.getTransactionId())
+                .source("PAYMENT")
+                .status("FAIL")
+                .orderId(payment.getOrderId())
+                .payload(payment)
+                .history(List.of(historyEntry))
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public EventPayment eventExpiring(Payment payment, UUID transactionId) {
+        final History historyEntry = History.builder()
+                .source("PAYMENT")
+                .status("ROLLBACK_PENDING")
+                .message("Status updated to:" + payment.getStatus().name())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+
+        return EventPayment.builder()
+                .id(UUID.randomUUID())
+                .transactionId(transactionId)
                 .source("PAYMENT")
                 .status("ROLLBACK_PENDING")
                 .orderId(payment.getOrderId())
@@ -47,4 +68,24 @@ public class EventPayment {
     }
 
 
+    public EventPayment eventSuccess(Payment payment) {
+        final History historyEntry = History.builder()
+                .source("PAYMENT")
+                .status(payment.getStatus().name())
+                .message("Status updated to:" + payment.getStatus().name())
+                .createdAt(LocalDateTime.now())
+                .build();
+
+
+        return EventPayment.builder()
+                .id(UUID.randomUUID())
+                .transactionId(payment.getTransactionId())
+                .source("PAYMENT")
+                .status("SUCCESS")
+                .orderId(payment.getOrderId())
+                .payload(payment)
+                .history(List.of(historyEntry))
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }
