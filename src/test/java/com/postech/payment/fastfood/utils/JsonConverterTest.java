@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
@@ -48,7 +49,8 @@ class JsonConverterTest {
     @Test
     void toJson_whenException_thenThrowConversionException() throws Exception {
         final Object object = new Object();
-        final Exception exception = new RuntimeException("Serialization error");
+        final JacksonException exception = mock(JacksonException.class);
+        when(exception.getMessage()).thenReturn("Serialization error");
         when(objectMapper.writeValueAsString(object)).thenThrow(exception);
 
         final ConversionException result = assertThrows(ConversionException.class, () -> jsonConverter.toJson(object));
@@ -74,7 +76,8 @@ class JsonConverterTest {
     @Test
     void toEventPayment_whenException_thenThrowConversionException() throws Exception {
         final String json = "invalid json";
-        final Exception exception = new RuntimeException("Deserialization error");
+        final JacksonException exception = mock(JacksonException.class);
+        when(exception.getMessage()).thenReturn("Deserialization error");
         when(objectMapper.readValue(json, EventPayment.class)).thenThrow(exception);
 
         final ConversionException result = assertThrows(ConversionException.class, () -> jsonConverter.toEventPayment(json));
@@ -100,7 +103,8 @@ class JsonConverterTest {
     @Test
     void toEventOrder_whenException_thenThrowConversionException() throws Exception {
         final String json = "invalid json";
-        final Exception exception = new RuntimeException("Deserialization error");
+        final JacksonException exception = mock(JacksonException.class);
+        when(exception.getMessage()).thenReturn("Deserialization error");
         when(objectMapper.readValue(json, EventOrder.class)).thenThrow(exception);
 
         final ConversionException result = assertThrows(ConversionException.class, () -> jsonConverter.toEventOrder(json));
