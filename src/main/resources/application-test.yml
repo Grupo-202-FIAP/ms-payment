@@ -1,8 +1,25 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-  flyway:
-    enabled: false # Or false if you want to skip migrations in tests
+    hibernate:
+      ddl-auto: create-drop
+  mercadoPago:
+    publicKey: mock-public-key
+    accessToken: mock-token
+    clientId: mock-id
+    clientSecret: mock-secret
+    externalPosID: mock-pos
+    webhook:
+      secretKey: mock-webhook
+
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        queues:
+          process-payment-queue: test-queue
