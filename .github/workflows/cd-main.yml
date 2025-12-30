@@ -1,0 +1,43 @@
+---
+name: CD - Production
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-prod:
+    name: Build & Push Image (Prod)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-orchestrator
+          aws-region: us-east-1
+
+      - name: Login no Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build e Push da imagem
+        env:
+          ECR_REPOSITORY: ms-orchestrator
+          IMAGE_TAG: ${{ github.sha }}
+          AWS_REGION: us-east-1
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          ECR_URI="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY"
+
+          docker build -t $ECR_URI:$IMAGE_TAG .
+          docker tag $ECR_URI:$IMAGE_TAG $ECR_URI:latest
+
+          docker push $ECR_URI:$IMAGE_TAG
+          docker push $ECR_URI:latest
