@@ -9,10 +9,12 @@ import software.amazon.awssdk.services.sns.SnsClient;
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = {
-        "spring.flyway.enabled=false"
+        "spring.flyway.enabled=false",
+        "spring.cloud.aws.region.static=us-east-1",
+        "spring.cloud.aws.credentials.access-key=noop",
+        "spring.cloud.aws.credentials.secret-key=noop"
 })
 class MsPaymentFastfoodApplicationTests {
-
     @MockitoBean
     private SnsClient snsClient;
 
@@ -22,5 +24,4 @@ class MsPaymentFastfoodApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
