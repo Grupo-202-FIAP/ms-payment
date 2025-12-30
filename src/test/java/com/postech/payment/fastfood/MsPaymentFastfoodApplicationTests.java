@@ -12,7 +12,8 @@ import software.amazon.awssdk.services.sns.SnsClient;
         "spring.flyway.enabled=false",
         "spring.cloud.aws.region.static=us-east-1",
         "spring.cloud.aws.credentials.access-key=noop",
-        "spring.cloud.aws.credentials.secret-key=noop"
+        "spring.cloud.aws.credentials.secret-key=noop",
+        "spring.cloud.aws.sns.paymentCallbackTopic=dummy-topic"
 })
 class MsPaymentFastfoodApplicationTests {
     @MockitoBean
