@@ -1,7 +1,5 @@
 package com.postech.payment.fastfood.infrastructure.http.mercadopago.security;
 
-import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
