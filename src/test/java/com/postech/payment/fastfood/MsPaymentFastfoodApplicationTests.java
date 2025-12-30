@@ -9,12 +9,21 @@ import software.amazon.awssdk.services.sns.SnsClient;
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = {
-        "spring.flyway.enabled=false",
-        "spring.cloud.aws.region.static=us-east-1",
-        "spring.cloud.aws.credentials.access-key=noop",
-        "spring.cloud.aws.credentials.secret-key=noop",
-        "spring.cloud.aws.sns.paymentCallbackTopic=dummy-topic",
-        "spring.cloud.aws.sqs.endpoint=http://localhost:4566"
+        "spring.profiles.active=${SPRING_PROFILES_ACTIVE:test}",
+        "server.port=${SERVER_PORT:8084}",
+        "mercadoPago.publicKey=${PUBLIC_KEY:none}",
+        "mercadoPago.accessToken=${ACCESS_TOKEN:none}",
+        "mercadoPago.clientId=${CLIENT_ID:none}",
+        "mercadoPago.clientSecret=${CLIENT_SECRET:none}",
+        "mercadoPago.externalPosID=${EXTERNAL_POS_ID:none}",
+        "mercadoPago.webhook.secretKey=${WEBHOOK_SECRET:none}",
+        "cloud.aws.region.static=${AWS_REGION:us-east-1}",
+        "cloud.aws.credentials.access-key=${AWS_ACCESS_KEY:test}",
+        "cloud.aws.credentials.secret-key=${AWS_SECRET_KEY:test}",
+        "spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}",
+        "spring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}",
+        "spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}",
+        "cloud.aws.sqs.queues.process-payment-queue=${PAYMENT_QUEUE_NAME:test-queue}"
 })
 class MsPaymentFastfoodApplicationTests {
     @MockitoBean
