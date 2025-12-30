@@ -13,12 +13,13 @@ import software.amazon.awssdk.services.sns.model.SnsException;
 public class ProducerEventPaymentStatusAdapter implements PublishEventPaymentStatusPort {
     private final SnsTemplate snsTemplate;
     private final LoggerPort logger;
-    @Value("${spring.cloud.aws.sns.paymentCallbackTopic}")
-    private String topicArn;
+    private final String topicArn;
 
-    public ProducerEventPaymentStatusAdapter(SnsTemplate snsTemplate, LoggerPort logger) {
+    public ProducerEventPaymentStatusAdapter(SnsTemplate snsTemplate, LoggerPort logger,
+                                            @Value("${spring.cloud.aws.sns.paymentCallbackTopic}") String topicArn) {
         this.snsTemplate = snsTemplate;
         this.logger = logger;
+        this.topicArn = topicArn;
     }
 
     @Override

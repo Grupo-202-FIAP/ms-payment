@@ -1,22 +1,20 @@
 package com.postech.payment.fastfood.infrastructure.http.mercadopago.security;
 
-import com.postech.payment.fastfood.application.ports.output.LoggerPort;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MercadoPagoWebhookSignatureValidator {
 
-    private final LoggerPort loggerPort;
-
-    @Value("${mercadoPago.webhook.secretKey}")
-    private String secretKey;
-    @Value("${mercadoPago.webhook.secretKey}")
-    private String mercadoPagoWebhookSecret;
-
-    public MercadoPagoWebhookSignatureValidator(LoggerPort loggerPort) {
-        this.loggerPort = loggerPort;
-    }
+//    private final LoggerPort loggerPort;
+//
+//    @Value("${mercadoPago.webhook.secretKey}")
+//    private String secretKey;
+//    @Value("${mercadoPago.webhook.secretKey}")
+//    private String mercadoPagoWebhookSecret;
+//
+//    public MercadoPagoWebhookSignatureValidator(LoggerPort loggerPort) {
+//        this.loggerPort = loggerPort;
+//    }
 
   /*
     public boolean verifySignatureOfProvider(String signature, String xRequestId, String dataId) {

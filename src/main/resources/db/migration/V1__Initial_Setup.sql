@@ -3,7 +3,7 @@ CREATE TABLE public.tb_qr_code
 (
     id           UUID           NOT NULL,
     currency     VARCHAR(255)   NOT NULL,
-    expires_at   TIMESTAMPTZ(6) NULL,
+    expires_at   TIMESTAMP NULL,
     order_id     UUID           NOT NULL,
     qr_code      VARCHAR(2048)  NOT NULL,
     total_amount NUMERIC(38, 2) NOT NULL,

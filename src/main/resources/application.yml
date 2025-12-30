@@ -26,13 +26,13 @@ server:
 
 # Shared Mercado Pago Config
 mercadoPago:
-  publicKey: ${PUBLIC_KEY}
-  accessToken: ${ACCESS_TOKEN}
-  clientId: ${CLIENT_ID}
-  clientSecret: ${CLIENT_SECRET}
-  externalPosID: ${EXTERNAL_POS_ID}
+  publicKey: ${PUBLIC_KEY:none}
+  accessToken: ${ACCESS_TOKEN:none}
+  clientId: ${CLIENT_ID:none}
+  clientSecret: ${CLIENT_SECRET:none}
+  externalPosID: ${EXTERNAL_POS_ID:none}
   webhook:
-    secretKey: ${WEBHOOK_SECRET}
+    secretKey: ${WEBHOOK_SECRET:none}
 
 cloud:
   aws:

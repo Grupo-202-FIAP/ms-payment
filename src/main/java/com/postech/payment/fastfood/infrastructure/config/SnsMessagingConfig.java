@@ -7,27 +7,36 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sns.SnsAsyncClient;
+import software.amazon.awssdk.services.sns.SnsClient;
 import java.net.URI;
+import io.awspring.cloud.sns.core.SnsTemplate;
 
 
 @Configuration
 public class SnsMessagingConfig {
-    @Value("${spring.cloud.aws.sqs.endpoint}")
-    private String snsEndpoint;
+    private final String snsEndpoint;
 
-    @Value("${spring.cloud.aws.region.static}")
-    private String region;
+    private final String region;
 
-    @Value("${spring.cloud.aws.credentials.access-key}")
-    private String accessKey;
+    private final String accessKey;
 
-    @Value("${spring.cloud.aws.credentials.secret-key}")
-    private String secretKey;
+    private final String secretKey;
+
+    public SnsMessagingConfig(
+            @Value("${spring.cloud.aws.sqs.endpoint}") String snsEndpoint,
+            @Value("${spring.cloud.aws.region.static}") String region,
+            @Value("${spring.cloud.aws.credentials.access-key}") String accessKey,
+            @Value("${spring.cloud.aws.credentials.secret-key}") String secretKey
+    ) {
+        this.snsEndpoint = snsEndpoint;
+        this.region = region;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+    }
 
     @Bean
-    public SnsAsyncClient snsAsyncClient() {
-        return SnsAsyncClient.builder()
+    public SnsClient snsClient() {
+        return SnsClient.builder()
                 .endpointOverride(URI.create(snsEndpoint))
                 .region(Region.of(region))
                 .credentialsProvider(
@@ -36,5 +45,10 @@ public class SnsMessagingConfig {
                         )
                 )
                 .build();
+    }
+
+    @Bean
+    public SnsTemplate snsTemplate(SnsClient snsClient) {
+        return new SnsTemplate(snsClient);
     }
 }
