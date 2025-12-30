@@ -1,5 +1,6 @@
 package com.postech.payment.fastfood;
 
+import com.postech.payment.fastfood.infrastructure.config.SnsMessagingConfig;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +32,8 @@ import software.amazon.awssdk.services.sns.SnsClient;
 class MsPaymentFastfoodApplicationTests {
     @MockitoBean
     private SnsClient snsClient;
-
+    @MockitoBean
+    private SnsMessagingConfig snsMessagingConfig;
     @MockitoBean
     private MercadoPagoClient mercadoPagoClient;
 
