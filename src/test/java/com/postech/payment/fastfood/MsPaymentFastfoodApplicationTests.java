@@ -1,5 +1,8 @@
 package com.postech.payment.fastfood;
 
+import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
+import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.consumer.ConsumerPaymentQueue;
+import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.producer.ProducerEventPaymentStatusAdapter;
 import com.postech.payment.fastfood.infrastructure.config.SnsMessagingConfig;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
 import org.junit.jupiter.api.Test;
@@ -36,6 +39,16 @@ class MsPaymentFastfoodApplicationTests {
     private SnsMessagingConfig snsMessagingConfig;
     @MockitoBean
     private MercadoPagoClient mercadoPagoClient;
+
+    @MockitoBean
+    private ConsumerPaymentQueue consumerPaymentQueue;
+
+    @MockitoBean
+    private GenerateQrCodePaymentUseCase generateQrCodePaymentUseCase;
+
+    @MockitoBean
+    private ProducerEventPaymentStatusAdapter producerEventPaymentStatusAdapter;
+
 
     @Test
     void contextLoads() {
