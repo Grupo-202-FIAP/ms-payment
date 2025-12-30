@@ -14,17 +14,25 @@ import io.awspring.cloud.sns.core.SnsTemplate;
 
 @Configuration
 public class SnsMessagingConfig {
-    @Value("${spring.cloud.aws.sqs.endpoint}")
-    private String snsEndpoint;
+    private final String snsEndpoint;
 
-    @Value("${spring.cloud.aws.region.static}")
-    private String region;
+    private final String region;
 
-    @Value("${spring.cloud.aws.credentials.access-key}")
-    private String accessKey;
+    private final String accessKey;
 
-    @Value("${spring.cloud.aws.credentials.secret-key}")
-    private String secretKey;
+    private final String secretKey;
+
+    public SnsMessagingConfig(
+            @Value("${spring.cloud.aws.sqs.endpoint}") String snsEndpoint,
+            @Value("${spring.cloud.aws.region.static}") String region,
+            @Value("${spring.cloud.aws.credentials.access-key}") String accessKey,
+            @Value("${spring.cloud.aws.credentials.secret-key}") String secretKey
+    ) {
+        this.snsEndpoint = snsEndpoint;
+        this.region = region;
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+    }
 
     @Bean
     public SnsClient snsClient() {
