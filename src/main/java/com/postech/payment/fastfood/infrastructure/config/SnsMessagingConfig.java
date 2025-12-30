@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.sns.SnsAsyncClient;
+import software.amazon.awssdk.services.sns.SnsClient;
 import java.net.URI;
+import io.awspring.cloud.sns.core.SnsTemplate;
 
 
 @Configuration
@@ -26,8 +27,8 @@ public class SnsMessagingConfig {
     private String secretKey;
 
     @Bean
-    public SnsAsyncClient snsAsyncClient() {
-        return SnsAsyncClient.builder()
+    public SnsClient snsClient() {
+        return SnsClient.builder()
                 .endpointOverride(URI.create(snsEndpoint))
                 .region(Region.of(region))
                 .credentialsProvider(
@@ -36,5 +37,10 @@ public class SnsMessagingConfig {
                         )
                 )
                 .build();
+    }
+
+    @Bean
+    public SnsTemplate snsTemplate(SnsClient snsClient) {
+        return new SnsTemplate(snsClient);
     }
 }
