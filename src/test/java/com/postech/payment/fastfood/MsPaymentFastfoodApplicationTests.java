@@ -13,7 +13,8 @@ import software.amazon.awssdk.services.sns.SnsClient;
         "spring.cloud.aws.region.static=us-east-1",
         "spring.cloud.aws.credentials.access-key=noop",
         "spring.cloud.aws.credentials.secret-key=noop",
-        "spring.cloud.aws.sns.paymentCallbackTopic=dummy-topic"
+        "spring.cloud.aws.sns.paymentCallbackTopic=dummy-topic",
+        "spring.cloud.aws.sqs.endpoint=http://localhost:4566"
 })
 class MsPaymentFastfoodApplicationTests {
     @MockitoBean
