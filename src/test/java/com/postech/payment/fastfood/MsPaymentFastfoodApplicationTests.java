@@ -24,6 +24,7 @@ import software.amazon.awssdk.services.sns.SnsClient;
         "spring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}",
         "spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}",
         "cloud.aws.sqs.queues.process-payment-queue=${PAYMENT_QUEUE_NAME:test-queue}"
+        "spring.cloud.aws.sqs.endpoint=${SPRING_CLOUD_AWS_SQS_ENDPOINT:http://localhost:4566}"
 })
 class MsPaymentFastfoodApplicationTests {
     @MockitoBean
