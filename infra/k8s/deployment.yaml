@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-payment
+  namespace: default
+  labels:
+    app: ms-payment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ms-payment
+  template:
+    metadata:
+      labels:
+        app: ms-payment
+        tags.datadoghq.com/service: ms-payment
+        tags.datadoghq.com/env: dev
+        tags.datadoghq.com/version: "1.0.0"
+    spec:
+      serviceAccountName: ms-payment-sa
+      containers:
+        - name: ms-payment
+          image: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/ms-payment:latest
+          ports:
+            - containerPort: 8091
+          envFrom:
+            - configMapRef:
+                name: ms-payment-config
+            - secretRef:
+                name: ms-payment-secrets
+          env:
+            - name: DD_SERVICE
+              value: ms-payment
+            - name: DD_ENV
+              value: dev
+            - name: DD_VERSION
+              value: "1.0.0"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8091
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8091
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

@@ -3,10 +3,6 @@ spring:
     name: ms-payment-fastfood
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none # Security best practice: handle via Flyway
 
 management:
   endpoints:
@@ -22,7 +18,7 @@ springdoc:
     enabled: true
 
 server:
-  port: ${SERVER_PORT:8084}
+  port: ${SERVER_PORT:8091}
 
 # Shared Mercado Pago Config
 mercadoPago:

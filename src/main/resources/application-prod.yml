@@ -5,7 +5,7 @@ spring:
 
   flyway:
     enabled: true
-    baseline-on-migrate: true  # <--- Add this line
+    baseline-on-migrate: true
     baseline-version: 1
 
   datasource:
@@ -16,7 +16,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: validate # Ensures DB matches entity model without changing it
+      ddl-auto: validate
 
   cloud:
     aws:
