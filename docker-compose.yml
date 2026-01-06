@@ -28,7 +28,7 @@ services:
 
 
   localstack:
-    image: localstack/localstack:latest
+    image: localstack/localstack:stable-amd64
     container_name: localstack
     restart: always
     ports:
@@ -74,7 +74,7 @@ services:
     networks:
       - fastfood
     ports:
-      - "8084:8084"
+      - "8091:8091"
     deploy:
       resources:
         limits:
@@ -89,7 +89,7 @@ services:
       - NGROK_AUTHTOKEN
     command:
       - "http"
-      - "ms-payment:8084"
+      - "ms-payment:8091"
     ports:
       - "4040:4040" # Dashboard: http://localhost:4040
     networks:

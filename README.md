@@ -52,7 +52,7 @@ MercadoPago, and PostgreSQL.
 
 ## Endpoints
 
-- Application runs on port `8084` by default (configurable via the `SERVER_PORT` environment variable)
+- Application runs on port `8091` by default (configurable via the `SERVER_PORT` environment variable)
 - Swagger UI: `/swagger-ui.html`
 - Health: `/actuator/health`
 - Prometheus: `/actuator/prometheus`

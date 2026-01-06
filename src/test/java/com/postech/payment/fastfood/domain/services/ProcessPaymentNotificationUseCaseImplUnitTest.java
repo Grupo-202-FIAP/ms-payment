@@ -61,7 +61,6 @@ class ProcessPaymentNotificationUseCaseImplUnitTest {
 
         assertThrows(NotificationValidationException.class,
                 () -> useCase.execute(event, null, "req", "data"));
-        // logger.error is called inside method but not asserted here (behavior validated by exception)
     }
 
     @Test
