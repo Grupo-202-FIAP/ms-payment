@@ -13,6 +13,9 @@ public class Order {
     private Payment payment;
     private List<OrderItem> items;
 
+    public Order() {
+    }
+
     public Order(
             UUID id,
             String identifier, BigDecimal totalPrice, OrderStatus status, Payment payment,

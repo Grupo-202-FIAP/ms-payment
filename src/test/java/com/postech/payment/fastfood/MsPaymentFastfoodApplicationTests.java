@@ -13,7 +13,7 @@ import software.amazon.awssdk.services.sns.SnsClient;
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = {"spring.profiles.active=${SPRING_PROFILES_ACTIVE:test}",
-        "server.port=${SERVER_PORT:8084}",
+        "server.port=${SERVER_PORT:8091}",
         "mercadoPago.publicKey=${PUBLIC_KEY:none}",
         "mercadoPago.accessToken=${ACCESS_TOKEN:none}",
         "mercadoPago.clientId=${CLIENT_ID:none}",

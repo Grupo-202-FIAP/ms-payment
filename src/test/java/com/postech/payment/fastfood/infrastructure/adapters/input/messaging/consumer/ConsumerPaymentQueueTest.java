@@ -2,6 +2,7 @@ package com.postech.payment.fastfood.infrastructure.adapters.input.messaging.con
 
 import com.postech.payment.fastfood.application.exception.ConversionException;
 import com.postech.payment.fastfood.application.exception.DatabaseException;
+import com.postech.payment.fastfood.application.exception.PaymentEventNotSupportedException;
 import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
@@ -32,6 +33,9 @@ class ConsumerPaymentQueueTest {
     private JsonConverter jsonConverter;
 
     @Mock
+    private PaymentEventHandler paymentEventHandler;
+
+    @Mock
     private GenerateQrCodePaymentUseCase generateQrCodePaymentUseCase;
 
     @Mock
@@ -46,7 +50,7 @@ class ConsumerPaymentQueueTest {
     }
 
     @Test
-    void consumeMessage_whenStatusIsSuccess_thenCallGenerateQrCodePaymentUseCase() {
+    void consumeMessage_whenStatusIsSuccess_thenCallPaymentEventHandler() {
         final String payload = "{\"status\":\"SUCCESS\"}";
         final UUID orderId = UUID.randomUUID();
         final UUID transactionId = UUID.randomUUID();
@@ -63,12 +67,11 @@ class ConsumerPaymentQueueTest {
         consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(generateQrCodePaymentUseCase).execute(order, transactionId);
-        verify(rollbackPaymentUseCase, never()).execute(any());
+        verify(paymentEventHandler).handle(event);
     }
 
     @Test
-    void consumeMessage_whenStatusIsRollbackPending_thenCallRollbackPaymentUseCase() {
+    void consumeMessage_whenStatusIsRollbackPending_thenCallPaymentEventHandler() {
         final String payload = "{\"status\":\"ROLLBACK_PENDING\"}";
         final UUID orderId = UUID.randomUUID();
         final EventOrder event = EventOrder.builder()
@@ -81,12 +84,11 @@ class ConsumerPaymentQueueTest {
         consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(rollbackPaymentUseCase).execute(orderId);
-        verify(generateQrCodePaymentUseCase, never()).execute(any(), any());
+        verify(paymentEventHandler).handle(event);
     }
 
     @Test
-    void consumeMessage_whenStatusIsUnhandled_thenLogWarningAndDoNothing() {
+    void consumeMessage_whenStatusIsUnhandled_thenPaymentEventNotSupportedExceptionIsCaughtAndLogged() {
         final String payload = "{\"status\":\"UNKNOWN\"}";
         final UUID orderId = UUID.randomUUID();
         final EventOrder event = EventOrder.builder()
@@ -95,13 +97,13 @@ class ConsumerPaymentQueueTest {
                 .build();
 
         when(jsonConverter.toEventOrder(payload)).thenReturn(event);
+        doThrow(new PaymentEventNotSupportedException("UNKNOWN")).when(paymentEventHandler).handle(event);
 
         consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(loggerPort).warn(anyString(), eq("UNKNOWN"), eq(orderId));
-        verify(generateQrCodePaymentUseCase, never()).execute(any(), any());
-        verify(rollbackPaymentUseCase, never()).execute(any());
+        verify(paymentEventHandler).handle(event);
+        verify(loggerPort).warn(anyString(), anyString());
     }
 
     @Test
@@ -111,40 +113,16 @@ class ConsumerPaymentQueueTest {
 
         when(jsonConverter.toEventOrder(payload)).thenThrow(exception);
 
+        // Should not throw - exception is caught and logged
         consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(loggerPort).error(anyString(), eq("Invalid JSON"));
-        verify(generateQrCodePaymentUseCase, never()).execute(any(), any());
-        verify(rollbackPaymentUseCase, never()).execute(any());
+        verify(paymentEventHandler, never()).handle(any());
+        verify(loggerPort).error(anyString(), any(Exception.class));
     }
 
     @Test
-    void consumeMessage_whenPaymentIntegrationExceptionWithIdempotency_thenLogWarningAndDoNotThrow() {
-        final String payload = "{\"status\":\"SUCCESS\"}";
-        final UUID orderId = UUID.randomUUID();
-        final UUID transactionId = UUID.randomUUID();
-        final Order order = new Order.Builder().id(orderId).build();
-        final EventOrder event = EventOrder.builder()
-                .orderId(orderId)
-                .transactionId(transactionId)
-                .status("SUCCESS")
-                .payload(order)
-                .build();
-        final PaymentIntegrationException exception = new PaymentIntegrationException("409 idempotency conflict");
-
-        when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-        doThrow(exception).when(generateQrCodePaymentUseCase).execute(order, transactionId);
-
-        consumerPaymentQueue.consumeMessage(payload);
-
-        verify(jsonConverter).toEventOrder(payload);
-        verify(generateQrCodePaymentUseCase).execute(order, transactionId);
-        verify(loggerPort).warn(anyString());
-    }
-
-    @Test
-    void consumeMessage_whenPaymentIntegrationExceptionWithoutIdempotency_thenThrowException() {
+    void consumeMessage_whenPaymentIntegrationException_thenLogErrorAndDoNotThrow() {
         final String payload = "{\"status\":\"SUCCESS\"}";
         final UUID orderId = UUID.randomUUID();
         final UUID transactionId = UUID.randomUUID();
@@ -158,17 +136,18 @@ class ConsumerPaymentQueueTest {
         final PaymentIntegrationException exception = new PaymentIntegrationException("Integration error");
 
         when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-        doThrow(exception).when(generateQrCodePaymentUseCase).execute(order, transactionId);
+        doThrow(exception).when(paymentEventHandler).handle(event);
 
-        assertThrows(PaymentIntegrationException.class, () -> consumerPaymentQueue.consumeMessage(payload));
+        // Should not throw - exception is caught and logged
+        consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(generateQrCodePaymentUseCase).execute(order, transactionId);
-        verify(loggerPort).error(anyString(), eq("Integration error"));
+        verify(paymentEventHandler).handle(event);
+        verify(loggerPort).error(anyString(), any(Exception.class));
     }
 
     @Test
-    void consumeMessage_whenDatabaseException_thenThrowException() {
+    void consumeMessage_whenDatabaseException_thenLogErrorAndDoNotThrow() {
         final String payload = "{\"status\":\"SUCCESS\"}";
         final UUID orderId = UUID.randomUUID();
         final UUID transactionId = UUID.randomUUID();
@@ -182,17 +161,18 @@ class ConsumerPaymentQueueTest {
         final DatabaseException exception = new DatabaseException("Database error");
 
         when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-        doThrow(exception).when(generateQrCodePaymentUseCase).execute(order, transactionId);
+        doThrow(exception).when(paymentEventHandler).handle(event);
 
-        assertThrows(DatabaseException.class, () -> consumerPaymentQueue.consumeMessage(payload));
+        // Should not throw - exception is caught and logged
+        consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(generateQrCodePaymentUseCase).execute(order, transactionId);
-        verify(loggerPort).error(anyString(), eq("Database error"));
+        verify(paymentEventHandler).handle(event);
+        verify(loggerPort).error(anyString(), any(Exception.class));
     }
 
     @Test
-    void consumeMessage_whenMessagingException_thenThrowException() {
+    void consumeMessage_whenMessagingException_thenLogErrorAndDoNotThrow() {
         final String payload = "{\"status\":\"SUCCESS\"}";
         final UUID orderId = UUID.randomUUID();
         final UUID transactionId = UUID.randomUUID();
@@ -206,13 +186,13 @@ class ConsumerPaymentQueueTest {
         final MessagingException exception = new MessagingException("Messaging error");
 
         when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-        doThrow(exception).when(generateQrCodePaymentUseCase).execute(order, transactionId);
+        doThrow(exception).when(paymentEventHandler).handle(event);
 
-        assertThrows(MessagingException.class, () -> consumerPaymentQueue.consumeMessage(payload));
+        // Should not throw - exception is caught and logged
+        consumerPaymentQueue.consumeMessage(payload);
 
         verify(jsonConverter).toEventOrder(payload);
-        verify(generateQrCodePaymentUseCase).execute(order, transactionId);
-        verify(loggerPort).error(anyString(), eq("Messaging error"));
+        verify(paymentEventHandler).handle(event);
+        verify(loggerPort).error(anyString(), any(Exception.class));
     }
 }
-
