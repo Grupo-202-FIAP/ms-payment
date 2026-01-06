@@ -308,9 +308,12 @@ class ConsumerPaymentQueueIntegrationTest {
             doThrow(new MessagingException("SNS publish failed"))
                     .when(publishEventPaymentStatusPort).publish(any());
 
-            // When & Then - MessagingException is not caught so it will propagate
+            // When & Then - MessagingException is caught, logged and message is removed from queue
             assertThatCode(() -> consumerPaymentQueue.consumeMessage(payload))
-                    .isInstanceOf(MessagingException.class);
+                    .doesNotThrowAnyException();
+
+            // Verify error was logged
+            verify(loggerPort).error(eq("[PaymentQueueListener] Erro de mensageria. Rollback publicado. Mensagem será removida da fila."), any(MessagingException.class));
         }
     }
 
