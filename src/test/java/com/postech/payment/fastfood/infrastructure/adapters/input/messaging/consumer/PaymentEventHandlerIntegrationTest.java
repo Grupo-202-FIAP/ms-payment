@@ -1,6 +1,8 @@
 package com.postech.payment.fastfood.infrastructure.adapters.input.messaging.consumer;
 
+import com.postech.payment.fastfood.application.exception.DatabaseException;
 import com.postech.payment.fastfood.application.exception.PaymentEventNotSupportedException;
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
@@ -247,7 +249,7 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("MercadoPago API error"))
+            doThrow(new PaymentIntegrationException("MercadoPago API error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -267,7 +269,7 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(75.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("Database error"))
+            doThrow(new DatabaseException("Database error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -291,7 +293,7 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("Connection timeout"))
+            doThrow(new PaymentIntegrationException("Connection timeout"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -315,7 +317,7 @@ class PaymentEventHandlerIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
             final String errorMessage = "Payment gateway unavailable";
 
-            doThrow(new RuntimeException(errorMessage))
+            doThrow(new PaymentIntegrationException(errorMessage))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -343,7 +345,7 @@ class PaymentEventHandlerIntegrationTest {
             final List<History> existingHistory = buildHistory("ORDER", "SUCCESS", "Order created");
             final EventOrder event = buildEventOrderWithHistory(orderId, transactionId, "SUCCESS", order, existingHistory);
 
-            doThrow(new RuntimeException("Processing failed"))
+            doThrow(new DatabaseException("Processing failed"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -367,7 +369,7 @@ class PaymentEventHandlerIntegrationTest {
             final UUID transactionId = UUID.randomUUID();
             final EventOrder event = buildEventOrder(orderId, transactionId, "FAIL", null);
 
-            doThrow(new RuntimeException("Payment not found for rollback"))
+            doThrow(new DatabaseException("Payment not found for rollback"))
                     .when(rollbackPaymentUseCase).execute(any(UUID.class));
 
             // When
@@ -387,14 +389,14 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("Processing error"))
+            doThrow(new PaymentIntegrationException("Processing error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
-            doThrow(new RuntimeException("SNS publish failed"))
+            doThrow(new IllegalArgumentException("SNS publish failed"))
                     .when(publishEventPaymentStatusPort).publish(any());
 
             // When & Then
             assertThatThrownBy(() -> paymentEventHandler.handle(event))
-                    .isInstanceOf(RuntimeException.class)
+                    .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("SNS publish failed");
         }
 
@@ -406,7 +408,7 @@ class PaymentEventHandlerIntegrationTest {
             final UUID transactionId = UUID.randomUUID();
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
-            final RuntimeException exception = new RuntimeException("Processing error");
+            final PaymentIntegrationException exception = new PaymentIntegrationException("Processing error");
 
             doThrow(exception).when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
@@ -415,7 +417,7 @@ class PaymentEventHandlerIntegrationTest {
 
             // Then
             verify(loggerPort).error(
-                    eq("[PaymentEventHandler] Erro ao processar evento, iniciando rollback. transactionId={}"),
+                    eq("[PaymentEventHandler] Erro de integração ao processar evento, iniciando rollback. transactionId={}"),
                     eq(transactionId),
                     eq(exception)
             );
@@ -435,7 +437,7 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("Error"))
+            doThrow(new PaymentIntegrationException("Error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -459,7 +461,7 @@ class PaymentEventHandlerIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
             final LocalDateTime before = LocalDateTime.now();
 
-            doThrow(new RuntimeException("Error"))
+            doThrow(new PaymentIntegrationException("Error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -483,7 +485,7 @@ class PaymentEventHandlerIntegrationTest {
             final Order order = buildOrder(orderId, BigDecimal.valueOf(100.00));
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
-            doThrow(new RuntimeException("Error"))
+            doThrow(new PaymentIntegrationException("Error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -506,7 +508,7 @@ class PaymentEventHandlerIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
             final LocalDateTime before = LocalDateTime.now();
 
-            doThrow(new RuntimeException("Error"))
+            doThrow(new PaymentIntegrationException("Error"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When

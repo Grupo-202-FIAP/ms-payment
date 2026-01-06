@@ -1,5 +1,7 @@
 package com.postech.payment.fastfood.integration;
 
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
+import com.postech.payment.fastfood.application.ports.output.PaymentPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentPort;
 import com.postech.payment.fastfood.application.ports.output.PaymentRepositoryPort;
 import com.postech.payment.fastfood.application.ports.output.PublishEventPaymentStatusPort;
@@ -368,7 +370,7 @@ class PaymentFlowIntegrationTest {
                             .build();
 
             when(paymentPort.createQrCode(any(Payment.class), any()))
-                    .thenThrow(new RuntimeException("MercadoPago API is unavailable"));
+                    .thenThrow(new PaymentIntegrationException("MercadoPago API is unavailable"));
 
             // When
             boolean result = paymentEventHandler.handle(event);
@@ -406,7 +408,7 @@ class PaymentFlowIntegrationTest {
                             .build();
 
             when(paymentPort.createQrCode(any(Payment.class), any()))
-                    .thenThrow(new RuntimeException("API Error"));
+                    .thenThrow(new PaymentIntegrationException("API Error"));
 
             // When
             paymentEventHandler.handle(event);

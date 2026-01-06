@@ -1,6 +1,8 @@
 package com.postech.payment.fastfood.infrastructure.adapters.input.messaging.consumer;
 
+import com.postech.payment.fastfood.application.exception.DatabaseException;
 import com.postech.payment.fastfood.application.exception.PaymentEventNotSupportedException;
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.messaging.MessagingException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -218,7 +221,7 @@ class ConsumerPaymentQueueIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "SUCCESS", order);
 
             when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-            doThrow(new RuntimeException("Integration error with MercadoPago"))
+            doThrow(new PaymentIntegrationException("Integration error with MercadoPago"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When - Should not throw exception (message should be removed from queue)
@@ -248,7 +251,7 @@ class ConsumerPaymentQueueIntegrationTest {
             final EventOrder event = buildEventOrderWithHistory(orderId, transactionId, "SUCCESS", order, existingHistory);
 
             when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-            doThrow(new RuntimeException("Database connection failed"))
+            doThrow(new DatabaseException("Database connection failed"))
                     .when(generateQrCodePaymentUseCase).execute(any(Order.class), any(UUID.class));
 
             // When
@@ -279,7 +282,7 @@ class ConsumerPaymentQueueIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "FAIL", null);
 
             when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-            doThrow(new RuntimeException("Payment not found for rollback"))
+            doThrow(new DatabaseException("Payment not found for rollback"))
                     .when(rollbackPaymentUseCase).execute(any(UUID.class));
 
             // When - Should not throw exception
@@ -300,14 +303,14 @@ class ConsumerPaymentQueueIntegrationTest {
             final EventOrder event = buildEventOrder(orderId, transactionId, "FAIL", null);
 
             when(jsonConverter.toEventOrder(payload)).thenReturn(event);
-            doThrow(new RuntimeException("Payment not found"))
+            doThrow(new DatabaseException("Payment not found"))
                     .when(rollbackPaymentUseCase).execute(any(UUID.class));
-            doThrow(new RuntimeException("SNS publish failed"))
+            doThrow(new MessagingException("SNS publish failed"))
                     .when(publishEventPaymentStatusPort).publish(any());
 
-            // When & Then - Should not throw exception because it's caught in the consumer
+            // When & Then - MessagingException is not caught so it will propagate
             assertThatCode(() -> consumerPaymentQueue.consumeMessage(payload))
-                    .doesNotThrowAnyException();
+                    .isInstanceOf(MessagingException.class);
         }
     }
 
