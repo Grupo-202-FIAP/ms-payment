@@ -2,7 +2,9 @@ package com.postech.payment.fastfood.infrastructure.adapters.input.messaging.con
 
 import static com.postech.payment.fastfood.domain.enums.EventSource.PAYMENT;
 
+import com.postech.payment.fastfood.application.exception.DatabaseException;
 import com.postech.payment.fastfood.application.exception.PaymentEventNotSupportedException;
+import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.ports.input.GenerateQrCodePaymentUseCase;
 import com.postech.payment.fastfood.application.ports.input.RollbackPaymentUseCase;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
@@ -11,10 +13,8 @@ import com.postech.payment.fastfood.domain.enums.SagaStatus;
 import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.EventOrder;
 import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.History;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
-import com.postech.payment.fastfood.utils.JsonConverter;
-import lombok.AllArgsConstructor;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -48,12 +48,34 @@ public class PaymentEventHandler {
         } catch (PaymentEventNotSupportedException ex) {
             logger.warn("[PaymentEventHandler] Evento ignorado: {}", ex.getMessage());
             throw ex;
-        } catch (Exception ex) {
-            logger.error("[PaymentEventHandler] Erro ao processar evento, iniciando rollback. transactionId={}", event.getTransactionId(), ex);
+        } catch (DatabaseException ex) {
+            logger.error(
+                    "[PaymentEventHandler] Erro de banco de dados ao processar evento, iniciando rollback. transactionId={}",
+                    event.getTransactionId(), ex);
+            publishRollback(event, ex.getMessage());
+            return false;
+        } catch (PaymentIntegrationException ex) {
+            logger.error(
+                    "[PaymentEventHandler] Erro de integração ao processar evento, iniciando rollback. transactionId={}",
+                    event.getTransactionId(), ex);
+            publishRollback(event, ex.getMessage());
+            return false;
+        } catch (MessagingException ex) {
+            logger.error(
+                    "[PaymentEventHandler] Erro de mensageria ao processar evento, iniciando rollback. transactionId={}",
+                    event.getTransactionId(), ex);
+            publishRollback(event, ex.getMessage());
+            return false;
+        } catch (IllegalArgumentException ex) {
+            logger.error(
+                    "[PaymentEventHandler] Status de evento inválido, iniciando rollback. transactionId={}",
+                    event.getTransactionId(), ex);
             publishRollback(event, ex.getMessage());
             return false;
         }
     }
+
+
 
     private void handleSuccess(EventOrder event) {
         final var order = event.getPayload();
@@ -69,14 +91,9 @@ public class PaymentEventHandler {
     }
 
     private void publishRollback(EventOrder event, String reason) {
-        try {
-            final var rollbackEvent = buildRollbackEvent(event, reason);
-            publishEventPaymentStatusPort.publish(rollbackEvent);
-            logger.info("[PaymentEventHandler] Rollback publicado com sucesso. transactionId={}", event.getTransactionId());
-        } catch (Exception ex) {
-            logger.error("[PaymentEventHandler] Falha crítica ao publicar rollback. transactionId={}", event.getTransactionId(), ex);
-            throw ex;
-        }
+        final var rollbackEvent = buildRollbackEvent(event, reason);
+        publishEventPaymentStatusPort.publish(rollbackEvent);
+        logger.info("[PaymentEventHandler] Rollback publicado com sucesso. transactionId={}", event.getTransactionId());
     }
 
     private EventPayment buildRollbackEvent(EventOrder event, String reason) {

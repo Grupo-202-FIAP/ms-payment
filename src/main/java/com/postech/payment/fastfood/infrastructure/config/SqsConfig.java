@@ -1,7 +1,6 @@
 package com.postech.payment.fastfood.infrastructure.config;
 
 import java.net.URI;
-
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
