@@ -23,16 +23,18 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: postgresdb-secret
+                  name: postgres-secret
                   key: username
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgresdb-secret
+                  name: postgres-secret
                   key: password
+            - name: POSTGRES_DB
+              value: production_db
           volumeMounts:
             - name: postgres-data
-              mountPath: /data/db
+              mountPath: /var/lib/postgresql/data
           resources:
             requests:
               cpu: "100m"
@@ -44,7 +46,7 @@ spec:
     - metadata:
         name: postgres-data
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
             storage: 5Gi
