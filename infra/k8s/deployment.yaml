@@ -21,7 +21,7 @@ spec:
       serviceAccountName: ms-payment-sa
       containers:
         - name: ms-payment
-          image: <ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/ms-payment:latest
+          image: 056075870573.dkr.ecr.us-east-1.amazonaws.com/ms-payment:latest
           ports:
             - containerPort: 8091
           envFrom:

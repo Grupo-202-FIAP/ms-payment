@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  db:
+  payment-db:
     image: postgres:17
-    container_name: postgres
+    container_name: payment-db
     restart: always
     environment:
       POSTGRES_DB: fastfood-payment
@@ -27,18 +27,19 @@ services:
           memory: 128M
 
 
-  localstack:
+  payment-localstack:
     image: localstack/localstack:stable-amd64
-    container_name: localstack
+    container_name: payment-localstack
     restart: always
     ports:
       - "4566:4566"
     environment:
       - SERVICES=sqs,sns
       - DEBUG=1
-      - AWS_DEFAULT_REGION=${AWS_REGION}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_SESSION_TOKEN=test
     volumes:
       - "./localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -50,9 +51,10 @@ services:
         limits:
           cpus: '0.50'
           memory: 128M
-  ms-payment:
+
+  payment-api:
     build: .
-    container_name: ms-payment
+    container_name: payment-api
     environment:
       - SPRING_PROFILES_ACTIVE
       - SPRING_DATASOURCE_URL
@@ -69,7 +71,7 @@ services:
       - AWS_SECRET_KEY
       - PAYMENT_QUEUE_NAME
     depends_on:
-      db:
+      payment-db:
         condition: service_healthy
     networks:
       - fastfood
@@ -89,13 +91,13 @@ services:
       - NGROK_AUTHTOKEN
     command:
       - "http"
-      - "ms-payment:8091"
+      - "payment-api:8091"
     ports:
       - "4040:4040" # Dashboard: http://localhost:4040
     networks:
       - fastfood
     depends_on:
-      - ms-payment
+      - payment-api
 
 volumes:
   pgdata:

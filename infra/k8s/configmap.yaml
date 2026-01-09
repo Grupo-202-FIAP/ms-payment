@@ -6,12 +6,6 @@ metadata:
 data:
   SPRING_PROFILES_ACTIVE: dev
   AWS_REGION: us-east-1
-  SQS_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/<ACCOUNT_ID>/payment-queue #Todo: Ajustar id
-  SQS_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/<ACCOUNT_ID>/payment-callback-queue #Todo: Ajustar id
-  SNS_PAYMENT_TOPIC_ARN: arn:aws:sns:us-east-1:<ACCOUNT_ID>:payment-topic #Todo: Ajustar id
-  MERCADOPAGO_BASE_URL: https://api.mercadopago.com
-  MERCADOPAGO_ENV: sandbox
-  DD_SERVICE: ms-payment
-  DD_ENV: dev
-  DD_VERSION: "1.0.0"
-  # Any other non-sensitive feature flags or defaults can be added here
+  SPRING_SQS_QUEUES_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/056075870573/payment-queue
+  SPRING_SQS_QUEUES_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/056075870573/payment-callback-queue
+

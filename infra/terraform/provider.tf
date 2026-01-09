@@ -9,8 +9,8 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "seu-bucket-terraform-state" //ToDo: ajustar
-    key            = "ms-payment/terraform.tfstate" //ToDo: ajustar
+    bucket         = "nextime-food-state-bucket"
+    key            = "ms-payment/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
   }

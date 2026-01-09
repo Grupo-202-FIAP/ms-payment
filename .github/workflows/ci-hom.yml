@@ -34,7 +34,7 @@ jobs:
         run: docker compose version
 
       - name: Subir LocalStack
-        run: docker compose up -d localstack
+        run: docker compose up -d payment-localstack
 
       - name: Aguardar LocalStack ficar saudável
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: Build Docker Image (no push)
         run: |
           docker build \
-            -t orchestrator-api:${{ github.sha }} \
+            -t payment-api:${{ github.sha }} \
             .
 
       - name: Derrubar containers
