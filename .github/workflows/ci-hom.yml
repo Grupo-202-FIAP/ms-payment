@@ -39,13 +39,13 @@ jobs:
       - name: Aguardar LocalStack ficar saudável
         run: |
           for i in {1..30}; do
-            STATUS=$(docker inspect --format='{{.State.Health.Status}}' localstack || true)
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' payment-localstack || true)
             if [ "$STATUS" = "healthy" ]; then
               exit 0
             fi
             sleep 5
           done
-          docker logs localstack
+          docker logs payment-localstack
           exit 1
 
       - name: Rodar testes (unit + integration)
