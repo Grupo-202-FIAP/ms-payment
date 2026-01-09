@@ -29,7 +29,7 @@ services:
 
   localstack:
     image: localstack/localstack:stable-amd64
-    container_name: localstack
+    container_name: payment-localstack
     restart: always
     ports:
       - "4566:4566"
@@ -52,7 +52,7 @@ services:
           memory: 128M
   ms-payment:
     build: .
-    container_name: ms-payment
+    container_name: payment-api
     environment:
       - SPRING_PROFILES_ACTIVE
       - SPRING_DATASOURCE_URL

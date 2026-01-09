@@ -1,43 +1,38 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: postgres
+  name: postgresdb
   namespace: default
 spec:
-  serviceName: postgres
+  serviceName: postgresdb
   replicas: 1
   selector:
     matchLabels:
-      app: postgres
+      app: postgresdb
   template:
     metadata:
       labels:
-        app: postgres
+        app: postgresdb
     spec:
       containers:
-        - name: postgres
+        - name: postgresdb
           image: postgres:17
           ports:
             - containerPort: 5432
           env:
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: ms-payment-secrets
-                  key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: ms-payment-secrets
-                  key: SPRING_DATASOURCE_USERNAME
+                  name: postgresdb-secret
+                  key: username
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ms-payment-secrets
-                  key: SPRING_DATASOURCE_PASSWORD
+                  name: postgresdb-secret
+                  key: password
           volumeMounts:
-            - name: pg-data
-              mountPath: /var/lib/postgresql/data
+            - name: postgres-data
+              mountPath: /data/db
           resources:
             requests:
               cpu: "100m"
@@ -47,10 +42,9 @@ spec:
               memory: "512Mi"
   volumeClaimTemplates:
     - metadata:
-        name: pg-data
+        name: postgres-data
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: gp3
         resources:
           requests:
             storage: 5Gi

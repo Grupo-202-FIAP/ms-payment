@@ -1,4 +1,3 @@
----
 name: CD - Production
 
 on:
@@ -10,9 +9,16 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: us-east-1
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  CLUSTER_NAME: nextime-cluster
+  ECR_REPOSITORY: ms-payment
+  ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/ms-payment
+
 jobs:
   deploy-prod:
-    name: Build & Push Image (Prod)
+    name: Build, Terraform & Deploy (Prod)
     runs-on: ubuntu-latest
 
     steps:
@@ -21,23 +27,51 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/github-actions-orchestrator
-          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-action-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        working-directory: infra/terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: infra/terraform
+        run: terraform apply -auto-approve
 
       - name: Login no Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build e Push da imagem
         env:
-          ECR_REPOSITORY: ms-orchestrator
           IMAGE_TAG: ${{ github.sha }}
-          AWS_REGION: us-east-1
         run: |
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          ECR_URI="$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY"
-
           docker build -t $ECR_URI:$IMAGE_TAG .
           docker tag $ECR_URI:$IMAGE_TAG $ECR_URI:latest
-
           docker push $ECR_URI:$IMAGE_TAG
           docker push $ECR_URI:latest
+
+      - name: Configure kubectl
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ env.AWS_REGION }} \
+            --name ${{ env.CLUSTER_NAME }}
+
+      - name: Aplicar manifests do Kubernetes
+        working-directory: infra/k8s
+        run: kubectl apply -R -f .
+
+      - name: Atualizar Deployment com nova imagem (se existir)
+        run: |
+          if kubectl get deployment ms-payment-deployment >/dev/null 2>&1; then
+            kubectl set image deployment/ms-payment-deployment \
+              ms-payment=$ECR_URI:${{ github.sha }}
+
+            kubectl rollout status deployment/ms-payment-deployment
+          else
+            echo "Deployment ms-payment-deployment ainda não existe (primeiro deploy)."
+          fi
