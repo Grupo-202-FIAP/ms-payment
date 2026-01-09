@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  db:
+  payment-db:
     image: postgres:17
-    container_name: postgres
+    container_name: payment-db
     restart: always
     environment:
       POSTGRES_DB: fastfood-payment
@@ -27,7 +27,7 @@ services:
           memory: 128M
 
 
-  localstack:
+  payment-localstack:
     image: localstack/localstack:stable-amd64
     container_name: payment-localstack
     restart: always
@@ -51,7 +51,8 @@ services:
         limits:
           cpus: '0.50'
           memory: 128M
-  ms-payment:
+
+  payment-api:
     build: .
     container_name: payment-api
     environment:
@@ -70,7 +71,7 @@ services:
       - AWS_SECRET_KEY
       - PAYMENT_QUEUE_NAME
     depends_on:
-      db:
+      payment-db:
         condition: service_healthy
     networks:
       - fastfood
@@ -90,13 +91,13 @@ services:
       - NGROK_AUTHTOKEN
     command:
       - "http"
-      - "ms-payment:8091"
+      - "payment-api:8091"
     ports:
       - "4040:4040" # Dashboard: http://localhost:4040
     networks:
       - fastfood
     depends_on:
-      - ms-payment
+      - payment-api
 
 volumes:
   pgdata:
