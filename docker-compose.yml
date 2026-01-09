@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  payment-db:
+    image: postgres:17
+    container_name: payment-db
+    restart: always
+    environment:
+      POSTGRES_DB: fastfood-payment
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - fastfood
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+
+
+  payment-localstack:
+    image: localstack/localstack:stable-amd64
+    container_name: payment-localstack
+    restart: always
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,sns
+      - DEBUG=1
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_SESSION_TOKEN=test
+    volumes:
+      - "./localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./localstack/init:/etc/localstack/init"
+    networks:
+      - fastfood
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+
+  payment-api:
+    build: .
+    container_name: payment-api
+    environment:
+      - SPRING_PROFILES_ACTIVE
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - PUBLIC_KEY
+      - ACCESS_TOKEN
+      - CLIENT_ID
+      - CLIENT_SECRET
+      - EXTERNAL_POS_ID
+      - WEBHOOK_SECRET
+      - AWS_REGION
+      - AWS_ACCESS_KEY
+      - AWS_SECRET_KEY
+      - PAYMENT_QUEUE_NAME
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - fastfood
+    ports:
+      - "8091:8091"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 128M
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok-tunnel
+    restart: always
+    environment:
+      - NGROK_AUTHTOKEN
+    command:
+      - "http"
+      - "payment-api:8091"
+    ports:
+      - "4040:4040" # Dashboard: http://localhost:4040
+    networks:
+      - fastfood
+    depends_on:
+      - payment-api
+
+volumes:
+  pgdata:
+
+networks:
+  fastfood:
+    driver: bridge

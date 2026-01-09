@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: ms-payment-fastfood
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8091}
+
+# Shared Mercado Pago Config
+mercadoPago:
+  publicKey: ${PUBLIC_KEY:none}
+  accessToken: ${ACCESS_TOKEN:none}
+  clientId: ${CLIENT_ID:none}
+  clientSecret: ${CLIENT_SECRET:none}
+  externalPosID: ${EXTERNAL_POS_ID:none}
+  webhook:
+    secretKey: ${WEBHOOK_SECRET:none}
+
+cloud:
+  aws:
+    region:
+      static: ${AWS_REGION:us-east-1}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}

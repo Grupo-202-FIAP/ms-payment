@@ -1,0 +1,25 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: false
+    baseline-version: 1
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+  cloud:
+    aws:
+      sqs:
+        queues:
+          process-payment-queue: ${PAYMENT_QUEUE_NAME}

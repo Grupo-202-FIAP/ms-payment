@@ -1,0 +1,14 @@
+package com.postech.payment.fastfood.infrastructure.adapters.input.controller.dto.response.mercadopago;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record OrderItemMP(
+        @JsonProperty("title")
+        String title,
+        @JsonProperty("unit_price")
+        Double unitPrice,
+        @JsonProperty("quantity")
+        Integer quantity,
+        @JsonProperty("external_code")
+        String externalCode) {
+}
