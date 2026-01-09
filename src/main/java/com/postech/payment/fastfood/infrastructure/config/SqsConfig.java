@@ -1,7 +1,6 @@
 package com.postech.payment.fastfood.infrastructure.config;
 
 import java.net.URI;
-import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +17,7 @@ public class SqsConfig {
     private String region;
 
     @Bean
-    @Profile({"local", "dev"})
+    @Profile("local")
     public SqsAsyncClient sqsAsyncClientLocal(
             @Value("${spring.cloud.aws.sqs.endpoint}") String endpoint
     ) {
@@ -34,27 +33,10 @@ public class SqsConfig {
     }
 
     @Bean
-    @Profile({"local", "dev"})
-    public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
-        return SqsMessageListenerContainerFactory.builder()
-                .sqsAsyncClient(sqsAsyncClient)
-                .build();
-    }
-
-    @Bean
-    @Profile("!local & !dev")
+    @Profile("!local")
     public SqsAsyncClient sqsAsyncClientEks() {
         return SqsAsyncClient.builder()
                 .region(Region.of(region))
                 .build();
     }
-
-    @Bean
-    @Profile("!local & !dev")
-    public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactoryEks(SqsAsyncClient sqsAsyncClient) {
-        return SqsMessageListenerContainerFactory.builder()
-                .sqsAsyncClient(sqsAsyncClient)
-                .build();
-    }
 }
-
