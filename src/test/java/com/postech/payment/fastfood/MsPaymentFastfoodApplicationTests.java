@@ -13,11 +13,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.services.sns.SnsClient;
 
 @ActiveProfiles("test")
-@SpringBootTest // Removemos as propriedades hardcoded daqui
+@SpringBootTest
 class MsPaymentFastfoodApplicationTests extends AbstractIntegrationTest {
-    // ^^^ AQUI ESTÁ A MÁGICA: Herdando do AbstractIntegrationTest
-
-    // Mantive seus Mocks, pois eles isolam componentes externos e deixam o teste mais leve
     @MockitoBean
     private SnsClient snsClient;
     @MockitoBean

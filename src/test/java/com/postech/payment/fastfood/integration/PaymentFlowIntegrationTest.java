@@ -87,9 +87,7 @@ class PaymentFlowIntegrationTest extends AbstractIntegrationTest {
             return new SqsTestSupport(sqsClient);
         }
     }
-    // ---------------------------------------------------------
 
-    // Mocks de dependências externas
     @MockitoBean
     private SnsClient snsClient;
 

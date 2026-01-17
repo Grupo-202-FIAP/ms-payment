@@ -24,5 +24,7 @@ spring:
         access-key: test
         secret-key: test
       sqs:
+        listener:
+          auto-startup: false
         queues:
           process-payment-queue: test-queue
