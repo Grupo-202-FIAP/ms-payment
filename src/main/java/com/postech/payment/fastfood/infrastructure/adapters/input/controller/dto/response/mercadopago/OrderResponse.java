@@ -22,4 +22,6 @@ public record OrderResponse(
         List<OrderItemMP> items,
         @JsonProperty("type_response")
         TypeResponse typeResponse) {
+     
+
 }
