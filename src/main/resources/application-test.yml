@@ -1,0 +1,30 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  mercadoPago:
+    baseUrl: ${MERCADO_PAGO_BASE_URL:https://api.mercadopago.com}
+    publicKey: ${PUBLIC_KEY:none}
+    accessToken: ${ACCESS_TOKEN:none}
+    clientId: ${CLIENT_ID:none}
+    clientSecret: ${CLIENT_SECRET:none}
+    externalPosID: ${EXTERNAL_POS_ID:none}
+    webhook:
+      secretKey: ${WEBHOOK_SECRET:none}
+
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      sqs:
+        listener:
+          auto-startup: false
+        queues:
+          process-payment-queue: test-queue
