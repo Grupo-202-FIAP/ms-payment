@@ -39,7 +39,20 @@ public class PaymentEventHandler {
 
     public boolean handle(EventOrder event) {
         try {
-            switch (SagaStatus.valueOf(event.getStatus())) {
+
+            if (event.getStatus() == null) {
+                logger.warn("[PaymentEventHandler] Evento ignorado: status nulo. transactionId={}", event.getTransactionId());
+                return false;
+            }
+
+
+            String rawStatus = event.getStatus();
+            if ("PENDING".equalsIgnoreCase(rawStatus)) {
+                logger.warn("[PaymentEventHandler] Status 'PENDING' recebido; mapeando para 'SUCCESS'. transactionId={}", event.getTransactionId());
+                rawStatus = SagaStatus.SUCCESS.name();
+            }
+
+            switch (SagaStatus.valueOf(rawStatus)) {
                 case SUCCESS -> handleSuccess(event);
                 case FAIL -> handleRollback(event);
                 default -> throw new PaymentEventNotSupportedException(event.getStatus());

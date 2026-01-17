@@ -5,6 +5,7 @@ import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.cons
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.producer.ProducerEventPaymentStatusAdapter;
 import com.postech.payment.fastfood.infrastructure.config.SnsMessagingConfig;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.MercadoPagoClient;
+import com.postech.payment.fastfood.integration.config.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,27 +13,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.services.sns.SnsClient;
 
 @ActiveProfiles("test")
-@SpringBootTest(properties = {"spring.profiles.active=${SPRING_PROFILES_ACTIVE:test}",
-        "server.port=${SERVER_PORT:8091}",
-        "mercadoPago.publicKey=${PUBLIC_KEY:none}",
-        "mercadoPago.accessToken=${ACCESS_TOKEN:none}",
-        "mercadoPago.clientId=${CLIENT_ID:none}",
-        "mercadoPago.clientSecret=${CLIENT_SECRET:none}",
-        "mercadoPago.externalPosID=${EXTERNAL_POS_ID:none}",
-        "mercadoPago.webhook.secretKey=${WEBHOOK_SECRET:none}",
-
-        // Propriedades do Spring Cloud AWS (v3.x+)
-        "spring.cloud.aws.region.static=${AWS_REGION:us-east-1}",
-        "spring.cloud.aws.credentials.access-key=${AWS_ACCESS_KEY:test}",
-        "spring.cloud.aws.credentials.secret-key=${AWS_SECRET_KEY:test}",
-        "spring.cloud.aws.sqs.endpoint=${SPRING_CLOUD_AWS_SQS_ENDPOINT:http://localhost:4566}",
-
-        "spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}",
-        "spring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}",
-        "spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}",
-        "cloud.aws.sqs.queues.process-payment-queue=${PAYMENT_QUEUE_NAME:test-queue}"
-})
-class MsPaymentFastfoodApplicationTests {
+@SpringBootTest
+class MsPaymentFastfoodApplicationTests extends AbstractIntegrationTest {
     @MockitoBean
     private SnsClient snsClient;
     @MockitoBean
@@ -49,8 +31,8 @@ class MsPaymentFastfoodApplicationTests {
     @MockitoBean
     private ProducerEventPaymentStatusAdapter producerEventPaymentStatusAdapter;
 
-
     @Test
     void contextLoads() {
+        // Agora o Docker vai subir automaticamente, configurar as portas e o contexto vai carregar com sucesso.
     }
 }

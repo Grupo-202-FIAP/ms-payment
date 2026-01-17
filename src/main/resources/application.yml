@@ -22,6 +22,7 @@ server:
 
 # Shared Mercado Pago Config
 mercadoPago:
+  baseUrl: ${MERCADO_PAGO_BASE_URL:https://api.mercadopago.com}
   publicKey: ${PUBLIC_KEY:none}
   accessToken: ${ACCESS_TOKEN:none}
   clientId: ${CLIENT_ID:none}
