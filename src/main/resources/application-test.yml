@@ -23,3 +23,8 @@ spring:
       sqs:
         queues:
           process-payment-queue: test-queue
+
+# Mock URL for MercadoPago API in tests (prevents hitting real API)
+mercadoPago:
+  api:
+    url: http://localhost:8089/mock-mercadopago

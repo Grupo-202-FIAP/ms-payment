@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(
         name = "mercadoPagoClient",
-        url = "https://api.mercadopago.com/v1/orders"
+        url = "${mercadoPago.api.url:https://api.mercadopago.com/v1/orders}"
 )
 @Component
 public interface MercadoPagoClient {
