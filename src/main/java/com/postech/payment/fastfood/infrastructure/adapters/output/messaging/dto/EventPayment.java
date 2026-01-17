@@ -5,6 +5,7 @@ import com.postech.payment.fastfood.infrastructure.adapters.input.messaging.dto.
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +15,9 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class EventPayment {
+
     private UUID id;
     private UUID transactionId;
     private UUID orderId;
@@ -93,4 +96,6 @@ public class EventPayment {
                 .createdAt(LocalDateTime.now())
                 .build();
     }
+
+
 }

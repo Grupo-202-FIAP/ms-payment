@@ -39,7 +39,20 @@ public class PaymentEventHandler {
 
     public boolean handle(EventOrder event) {
         try {
-            switch (SagaStatus.valueOf(event.getStatus())) {
+
+            if (event.getStatus() == null) {
+                logger.warn("[PaymentEventHandler] Evento ignorado: status nulo. transactionId={}", event.getTransactionId());
+                return false;
+            }
+
+
+            String rawStatus = event.getStatus();
+            if ("PENDING".equalsIgnoreCase(rawStatus)) {
+                logger.warn("[PaymentEventHandler] Status 'PENDING' recebido; mapeando para 'SUCCESS'. transactionId={}", event.getTransactionId());
+                rawStatus = SagaStatus.SUCCESS.name();
+            }
+
+            switch (SagaStatus.valueOf(rawStatus)) {
                 case SUCCESS -> handleSuccess(event);
                 case FAIL -> handleRollback(event);
                 default -> throw new PaymentEventNotSupportedException(event.getStatus());
@@ -56,7 +69,7 @@ public class PaymentEventHandler {
             return false;
         } catch (PaymentIntegrationException ex) {
             logger.error(
-                    "[PaymentEventHandler] Erro de integração ao processar evento, iniciando rollback. transactionId={}",
+                    "[PaymentEventHandler] Erro de integra\u00e7\u00e3o ao processar evento, iniciando rollback. transactionId={}",
                     event.getTransactionId(), ex);
             publishRollback(event, ex.getMessage());
             return false;
@@ -68,7 +81,7 @@ public class PaymentEventHandler {
             return false;
         } catch (IllegalArgumentException ex) {
             logger.error(
-                    "[PaymentEventHandler] Status de evento inválido, iniciando rollback. transactionId={}",
+                    "[PaymentEventHandler] Status de evento inv\u00e1lido, iniciando rollback. transactionId={}",
                     event.getTransactionId(), ex);
             publishRollback(event, ex.getMessage());
             return false;
@@ -87,7 +100,7 @@ public class PaymentEventHandler {
     private void handleRollback(EventOrder event) {
         logger.info("[PaymentEventHandler] Executando rollback do pagamento. orderId={}", event.getOrderId());
         rollbackPaymentUseCase.execute(event.getOrderId());
-        logger.info("[PaymentEventHandler] Rollback do pagamento concluído. orderId={}", event.getOrderId());
+        logger.info("[PaymentEventHandler] Rollback do pagamento conclu\u00eddo. orderId={}", event.getOrderId());
     }
 
     private void publishRollback(EventOrder event, String reason) {
