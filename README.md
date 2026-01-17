@@ -65,6 +65,16 @@ MercadoPago, and PostgreSQL.
   ./mvnw test
   ```
 
+### Test Configuration
+
+Integration tests use mocks for external dependencies to ensure tests don't hit real services:
+
+- **MercadoPago API**: Tests use `@MockitoBean` to mock the `MercadoPagoClient`. The test profile (`application-test.yml`) configures a mock URL (`http://localhost:8089/mock-mercadopago`) as an additional safeguard.
+- **AWS SQS/SNS**: Tests mock AWS clients (`SnsClient`, `SqsClient`) to prevent actual AWS API calls.
+- **Database**: Tests use H2 in-memory database instead of PostgreSQL.
+
+The `MercadoPagoClient` URL is configurable via the `mercadoPago.api.url` property, defaulting to the production API URL when not set.
+
 ## Deployment
 
 - For production, ensure all environment variables are set and AWS credentials are configured (preferably via IAM
