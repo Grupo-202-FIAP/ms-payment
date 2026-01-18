@@ -307,25 +307,6 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/PaymentFastfoodApplication.*</exclude>
-
-                        <exclude>**/application/exception/**</exclude>
-                        <exclude>**/application/mapper/**</exclude>
-
-                        <exclude>**/domain/enums/**</exclude>
-                        <exclude>**/domain/model/**</exclude>
-
-                        <exclude>**/infrastructure/config/**</exclude>
-
-                        <exclude>**/infrastructure/**/dto/**</exclude>
-
-                        <exclude>**/infrastructure/persistence/entity/**</exclude>
-                        <exclude>**/infrastructure/persistence/mapper/**</exclude>
-
-                        <exclude>**/infrastructure/http/**/security/**</exclude>
-                        <exclude>**/support/builders/**</exclude>
-                    </excludes>
                     <rules>
                         <rule>
                             <element>BUNDLE</element>
