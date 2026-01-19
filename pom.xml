@@ -310,11 +310,6 @@
                     <includes>
                         <include>com/postech/**</include>
                     </includes>
-                    <excludes>
-                        <exclude>**/config/**</exclude>
-                        <exclude>**/domain/**</exclude>
-                        <exclude>**/infrastructure/**</exclude>
-                    </excludes>
                     <rules>
                         <rule>
                             <element>BUNDLE</element>
