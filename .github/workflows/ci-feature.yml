@@ -47,8 +47,15 @@ jobs:
           echo "Aguardando LocalStack subir..."
           sleep 25
 
-      - name: Rodar testes (unit + integration)
-        run: mvn clean verify
+      - name: Rodar testes e Análise Sonar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=Grupo-202-FIAP_ms-payment \
+          -Dsonar.organization=grupo-202-fiap \
+          -Dsonar.host.url=https://sonarcloud.io
 
       - name: Upload Jacoco Report
         uses: actions/upload-artifact@v4
