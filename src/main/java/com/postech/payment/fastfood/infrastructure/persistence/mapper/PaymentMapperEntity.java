@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentMapperEntity {
 
+    public PaymentMapperEntity() {
+    }
+
     public static Payment toDomain(PaymentEntity paymentEntity) {
         if (paymentEntity == null) {
             return null;
@@ -41,8 +44,8 @@ public class PaymentMapperEntity {
                 .transactionId(payment.getTransactionId())
                 .build();
 
-        if (payment.getQrCode() != null) {
-            final QrCodeEntity qrCodeEntity = QrCodeMapperEntity.toEntity(payment.getQrCode());
+        if (payment.getQrData() != null) {
+            final QrCodeEntity qrCodeEntity = QrCodeMapperEntity.toEntity(payment.getQrData());
             qrCodeEntity.setPayment(entity);
             entity.setQrCode(qrCodeEntity);
         }

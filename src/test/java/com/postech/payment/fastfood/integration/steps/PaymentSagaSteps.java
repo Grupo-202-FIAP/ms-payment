@@ -283,7 +283,7 @@ public class PaymentSagaSteps {
         Optional<Payment> payment = paymentRepositoryPort.findByOrderId(currentOrderId);
 
         assertThat(payment).isPresent();
-        assertThat(payment.get().getQrCode())
+        assertThat(payment.get().getQrData())
                 .withFailMessage("QR Code não foi gerado para o pagamento")
                 .isNotNull();
     }
