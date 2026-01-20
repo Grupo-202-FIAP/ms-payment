@@ -15,24 +15,7 @@ public class Payment {
     private LocalDateTime updatedAt;
     private BigDecimal amount;
     private UUID orderId;
-    private QrCode qrCode;
-
-    public Payment(UUID id,
-                   PaymentStatus status,
-                   PaymentMethod paymentMethod,
-                   LocalDateTime paymentDateTime,
-                   LocalDateTime updatedAt,
-                   BigDecimal amount, UUID orderId,
-                   QrCode qrCode) {
-        this.id = id;
-        this.status = status;
-        this.paymentMethod = paymentMethod;
-        this.paymentDateTime = paymentDateTime;
-        this.updatedAt = updatedAt;
-        this.amount = amount;
-        this.orderId = orderId;
-        this.qrCode = qrCode;
-    }
+    private QrCode qrData;
 
     public Payment() {
     }
@@ -45,7 +28,7 @@ public class Payment {
         this.updatedAt = builder.updatedAt;
         this.orderId = builder.orderId;
         this.amount = builder.amount;
-        this.qrCode = builder.qrCode;
+        this.qrData = builder.qrCode;
         this.transactionId = builder.transactionId;
     }
 
@@ -105,12 +88,12 @@ public class Payment {
         this.orderId = orderId;
     }
 
-    public QrCode getQrCode() {
-        return qrCode;
+    public QrCode getQrData() {
+        return qrData;
     }
 
-    public void setQrCode(QrCode qrCode) {
-        this.qrCode = qrCode;
+    public void setQrData(QrCode qrData) {
+        this.qrData = qrData;
     }
 
     public UUID getTransactionId() {

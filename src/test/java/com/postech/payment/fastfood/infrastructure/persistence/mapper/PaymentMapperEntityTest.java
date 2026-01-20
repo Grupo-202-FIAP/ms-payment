@@ -51,7 +51,7 @@ class PaymentMapperEntityTest {
         assertEquals(PaymentMethod.QR_CODE, result.getPaymentMethod());
         assertEquals(now, result.getPaymentDateTime());
         assertEquals(now, result.getUpdatedAt());
-        assertNull(result.getQrCode());
+        assertNull(result.getQrData());
     }
 
     @Test
@@ -90,8 +90,8 @@ class PaymentMapperEntityTest {
 
         assertNotNull(result);
         assertEquals(paymentId, result.getId());
-        assertNotNull(result.getQrCode());
-        final QrCode qrCode = result.getQrCode();
+        assertNotNull(result.getQrData());
+        final QrCode qrCode = result.getQrData();
         assertEquals(qrCodeId, qrCode.getId());
         assertEquals(orderId, qrCode.getOrderId());
         assertEquals(BigDecimal.valueOf(100.50), qrCode.getTotalAmount());

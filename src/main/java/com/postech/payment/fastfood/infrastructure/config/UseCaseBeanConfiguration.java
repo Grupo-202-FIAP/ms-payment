@@ -12,7 +12,6 @@ import com.postech.payment.fastfood.domain.services.FindPaymentByOrderIdUseCaseI
 import com.postech.payment.fastfood.domain.services.GenerateQrCodePaymentUseCaseImpl;
 import com.postech.payment.fastfood.domain.services.ProcessPaymentNotificationUseCaseImpl;
 import com.postech.payment.fastfood.domain.services.RollbackPaymentUseCaseImpl;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,10 +32,8 @@ public class UseCaseBeanConfiguration {
 
     @Bean
     public ProcessPaymentNotificationUseCase processPaymentNotificationUseCase(
-            MercadoPagoWebhookSignatureValidator mercadoPagoWebhookSignatureValidator,
             LoggerPort logger, PaymentRepositoryPort paymentRepositoryPort, PublishEventPaymentStatusPort publishEventPaymentStatusPort) {
-        return new ProcessPaymentNotificationUseCaseImpl(
-                mercadoPagoWebhookSignatureValidator, paymentRepositoryPort, publishEventPaymentStatusPort,
+        return new ProcessPaymentNotificationUseCaseImpl(paymentRepositoryPort, publishEventPaymentStatusPort,
                 logger);
     }
 

@@ -6,6 +6,10 @@ import com.postech.payment.fastfood.infrastructure.persistence.entity.PaymentEnt
 import com.postech.payment.fastfood.infrastructure.persistence.entity.QrCodeEntity;
 
 public class QrCodeMapperEntity {
+
+    public QrCodeMapperEntity() {
+    }
+
     public static QrCode toDomain(QrCodeEntity entity) {
         if (entity == null) {
             return null;
