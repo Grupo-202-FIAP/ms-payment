@@ -16,14 +16,18 @@ import java.util.UUID;
 public class PaymentController {
 
     private final FindPaymentByOrderIdUseCase findPaymentByOrderIdUseCase;
+    private final LoggerPort logger;
 
     public PaymentController(FindPaymentByOrderIdUseCase findPaymentByOrderIdUseCase, LoggerPort logger) {
         this.findPaymentByOrderIdUseCase = findPaymentByOrderIdUseCase;
+        this.logger = logger;
     }
 
     @GetMapping("{orderId}")
     public ResponseEntity<PaymentResponse> findPaymentByOrderId(@PathVariable UUID orderId) {
+        logger.info("[Payment][Controller] Finding payment for orderId: {}", orderId);
         final PaymentResponse payment = PaymentMapper.toResponse(findPaymentByOrderIdUseCase.findPaymentByOrderId(orderId));
+        logger.info("[Payment][Controller] PaymentResponse of Payment.ID: {}", payment.id());
         return ResponseEntity.ok(payment);
     }
 

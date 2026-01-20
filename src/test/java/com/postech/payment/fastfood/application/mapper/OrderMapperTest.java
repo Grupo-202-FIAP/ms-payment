@@ -6,6 +6,7 @@ import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.OrderItem;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.domain.model.Product;
+import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.ItemDto;
 import com.postech.payment.fastfood.infrastructure.http.mercadopago.dto.request.OrderMPRequestDto;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,7 @@ class OrderMapperTest {
 
     @Test
     void toMPVOrderRequest_whenValidInput_thenReturnOrderMPRequestDto() {
+        // --- Given (Setup) ---
         final UUID orderId = UUID.randomUUID();
         final UUID paymentId = UUID.randomUUID();
         final LocalDateTime now = LocalDateTime.now();
@@ -55,38 +57,33 @@ class OrderMapperTest {
         final OrderMPRequestDto result = OrderMapper.toMPVOrderRequest(payment, orderItems, posId, mode);
 
         assertNotNull(result);
+
         assertEquals("qr", result.type());
         assertEquals("150.75", result.total_amount());
         assertEquals("Pedido FastFood - " + orderId, result.description());
         assertEquals(orderId.toString(), result.external_reference());
         assertEquals("PT10M", result.expiration_time());
-        assertNotNull(result.config());
-        assertNotNull(result.config().qr());
+
         assertEquals(posId, result.config().qr().external_pos_id());
         assertEquals(mode, result.config().qr().mode());
-        assertNotNull(result.transactions());
-        assertNotNull(result.transactions().payments());
+
         assertEquals(1, result.transactions().payments().size());
         assertEquals("150.75", result.transactions().payments().get(0).amount());
-        assertNotNull(result.items());
+
         assertEquals(2, result.items().size());
 
-        final var firstItem = result.items().get(0);
-        assertEquals("Burger", firstItem.title());
-        assertEquals("25.5", firstItem.unit_price());
-        assertEquals(2, firstItem.quantity());
-        assertEquals("UN", firstItem.unit_measure());
-        assertEquals(product1.getId().toString(), firstItem.external_code());
-        assertNotNull(firstItem.external_categories());
-        assertEquals(1, firstItem.external_categories().size());
-        assertEquals(Category.SANDWICHES.getCategory(), firstItem.external_categories().get(0).id());
+        assertItem(result.items().get(0), "Burger", "25.5", 2, product1.getId().toString(), Category.SANDWICHES);
+        assertItem(result.items().get(1), "Coke", "5.25", 1, product2.getId().toString(), Category.DRINKS);
+    }
 
-        final var secondItem = result.items().get(1);
-        assertEquals("Coke", secondItem.title());
-        assertEquals("5.25", secondItem.unit_price());
-        assertEquals(1, secondItem.quantity());
-        assertEquals(product2.getId().toString(), secondItem.external_code());
-        assertEquals(Category.DRINKS.getCategory(), secondItem.external_categories().get(0).id());
+    private void assertItem(ItemDto item, String title, String price, int quantity, String extCode, Category category) {
+        assertEquals(title, item.title());
+        assertEquals(price, item.unit_price());
+        assertEquals(quantity, item.quantity());
+        assertEquals("UN", item.unit_measure());
+        assertEquals(extCode, item.external_code());
+        // Implicit null check on categories list
+        assertEquals(category.getValue(), item.external_categories().get(0).id());
     }
 }
 

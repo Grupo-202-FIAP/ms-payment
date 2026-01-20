@@ -9,14 +9,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaymentMapper {
 
+    public PaymentMapper() {
+
+    }
+
     public static PaymentResponse toResponse(Payment payment) {
         if (payment == null) {
             return null;
         }
 
         QrCodeResponse qrCodeResponse = null;
-        if (payment.getQrCode() != null) {
-            final QrCode qrCode = payment.getQrCode();
+        if (payment.getQrData() != null) {
+            final QrCode qrCode = payment.getQrData();
             qrCodeResponse = new QrCodeResponse(
                     qrCode.getId(),
                     qrCode.getOrderId(),

@@ -6,14 +6,14 @@ public enum Category {
     DRINKS("DRINKS"),
     DESSERTS("DESSERTS");
 
-    private final String category;
+    private final String value;
 
-    Category(String category) {
-        this.category = category;
+    Category(String value) {
+        this.value = value;
     }
 
-    public String getCategory() {
-        return category;
+    public String getValue() {
+        return value;
     }
 
 }

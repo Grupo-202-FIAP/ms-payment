@@ -5,7 +5,6 @@ import com.postech.payment.fastfood.application.ports.input.ProcessPaymentNotifi
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.WebhookEvent;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
+
 @RestController
 @RequestMapping("/webhook")
-@Slf4j
 public class PaymentNotificationWebhook {
 
     private final ProcessPaymentNotificationUseCase processPaymentNotification;
@@ -39,28 +38,46 @@ public class PaymentNotificationWebhook {
 
 
         logger.info("[WEBHOOK][PAYMENT][DEBUG] === ALL QUERY PARAMS ===");
-        request.getParameterMap().forEach((key, values) ->
-                logger.info("[WEBHOOK][PAYMENT][DEBUG] Param: '{}' = '{}'", key, String.join(",", values))
-        );
 
-        // DEBUG: Log dos headers
-        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-signature: '{}'", signature);
-        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-request-id: '{}'", requestId);
+        request.getParameterMap().forEach((key, values) -> {
+            final String cleanKey = sanitizeLog(key);
+            final String cleanValues = sanitizeLog(String.join(",", values));
+            logger.info("[WEBHOOK][PAYMENT][DEBUG] Param: '{}' = '{}'", cleanKey, cleanValues);
+        });
+
+        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-signature: '{}'", sanitizeLog(signature));
+        logger.info("[WEBHOOK][PAYMENT][DEBUG] x-request-id: '{}'", sanitizeLog(requestId));
 
         final String finalDataId = dataIdParam != null ? dataIdParam : idParam;
 
         if (finalDataId == null) {
             logger.error("[WEBHOOK][PAYMENT] ERROR: No 'data.id' or 'id' parameter found!");
-            logger.error("[WEBHOOK][PAYMENT] Available params: {}", request.getParameterMap().keySet());
+            logger.error("[WEBHOOK][PAYMENT] Available params: {}", sanitizeLog(String.valueOf(request.getParameterMap().keySet())));
             return ResponseEntity.badRequest().body("Missing required parameter: data.id or id");
         }
 
-        logger.info("[WEBHOOK][PAYMENT] Using dataId: '{}'", finalDataId);
+        logger.info("[WEBHOOK][PAYMENT] Using dataId: '{}'", sanitizeLog(finalDataId));
+
         logger.info("[WEBHOOK][PAYMENT] Received payment notification: event={}, signature={}, requestId={}, dataId={}",
-                webhookEvent, signature, requestId, finalDataId);
+                sanitizeLog(String.valueOf(webhookEvent)),
+                sanitizeLog(signature),
+                sanitizeLog(requestId),
+                sanitizeLog(finalDataId));
 
         processPaymentNotification.execute(webhookEvent, signature, requestId, finalDataId);
         return ResponseEntity.ok("Payment notification received successfully");
     }
 
+    /**
+     * Replaces newlines and carriage returns with underscores to prevent Log Forging.
+     * @param input The user-controlled string.
+     * @return The sanitized string safe for logging.
+     */
+    private String sanitizeLog(String input) {
+        if (input == null) {
+            return "null";
+        }
+        // Replace \n (newline) and \r (carriage return) with an underscore or space
+        return input.replaceAll("[\n\r]", "_");
+    }
 }
