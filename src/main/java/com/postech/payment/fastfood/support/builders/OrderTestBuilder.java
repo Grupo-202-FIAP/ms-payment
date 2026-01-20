@@ -18,6 +18,10 @@ import java.util.List;
 import java.util.UUID;
 
 public class OrderTestBuilder {
+
+    public OrderTestBuilder() {
+    }
+
     public static Order validOrder() {
         final Product product = new Product.Builder()
                 .id(1L)

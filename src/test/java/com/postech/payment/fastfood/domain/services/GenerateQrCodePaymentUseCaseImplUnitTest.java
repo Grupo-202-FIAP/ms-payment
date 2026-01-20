@@ -58,7 +58,7 @@ class GenerateQrCodePaymentUseCaseImplUnitTest {
                 .status(PaymentStatus.PENDING)
                 .build();
 
-        existing.setQrCode(new com.postech.payment.fastfood.domain.model.QrCode.Builder()
+        existing.setQrData(new com.postech.payment.fastfood.domain.model.QrCode.Builder()
                 .orderId(order.getId())
                 .expiresAt(OffsetDateTime.now().minusDays(1))
                 .build());
@@ -81,7 +81,7 @@ class GenerateQrCodePaymentUseCaseImplUnitTest {
                 .status(PaymentStatus.PENDING)
                 .build();
 
-        existing.setQrCode(new com.postech.payment.fastfood.domain.model.QrCode.Builder()
+        existing.setQrData(new com.postech.payment.fastfood.domain.model.QrCode.Builder()
                 .orderId(order.getId())
                 .expiresAt(OffsetDateTime.now().plusDays(1))
                 .build());
@@ -116,8 +116,8 @@ class GenerateQrCodePaymentUseCaseImplUnitTest {
 
         verify(paymentRepositoryPort).save(paymentCaptor.capture());
         final Payment saved = paymentCaptor.getValue();
-        assertNotNull(saved.getQrCode());
-        assertEquals("qrcode-data", saved.getQrCode().getQrCode());
+        assertNotNull(saved.getQrData());
+        assertEquals("qrcode-data", saved.getQrData().getQrCode());
     }
 
     @Test
@@ -159,8 +159,8 @@ class GenerateQrCodePaymentUseCaseImplUnitTest {
         verify(paymentRepositoryPort).save(paymentCaptor.capture());
         final Payment saved = paymentCaptor.getValue();
         assertEquals(existing, saved); // Should be the same payment instance
-        assertNotNull(saved.getQrCode());
-        assertEquals("qrcode-data", saved.getQrCode().getQrCode());
+        assertNotNull(saved.getQrData());
+        assertEquals("qrcode-data", saved.getQrData().getQrCode());
         verify(publishEventPaymentStatusPort, never()).publish(any());
     }
 }

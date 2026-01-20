@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 @Component
 public class OrderMapper {
 
+    public OrderMapper() {
+
+    }
+
     public static OrderMPRequestDto toMPVOrderRequest(Payment payment, List<OrderItem> orderItems, String posId, String mode) {
         final List<ItemDto> items = orderItems.stream().map(item ->
                 ItemDto.builder()
@@ -25,7 +29,7 @@ public class OrderMapper {
                         .unit_measure("UN")
                         .external_code(item.getProduct().getId().toString())
                         .external_categories(
-                                List.of(CategoryIdDto.builder().id(item.getProduct().getCategory().getCategory()).build())
+                                List.of(CategoryIdDto.builder().id(item.getProduct().getCategory().getValue()).build())
                         )
                         .build()
         ).collect(Collectors.toList());

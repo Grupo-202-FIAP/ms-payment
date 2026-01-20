@@ -10,24 +10,20 @@ import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.WebhookEvent;
 import com.postech.payment.fastfood.infrastructure.adapters.output.messaging.dto.EventPayment;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import java.util.Optional;
 import java.util.UUID;
 
 public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNotificationUseCase {
 
-
-    private final MercadoPagoWebhookSignatureValidator mercadoPagoWebhookSignatureValidator;
     private final PaymentRepositoryPort paymentRepositoryPort;
     private final PublishEventPaymentStatusPort publishEventPaymentStatusPort;
     private final LoggerPort logger;
 
     public ProcessPaymentNotificationUseCaseImpl(
-            MercadoPagoWebhookSignatureValidator mercadoPagoWebhookSignatureValidator,
             PaymentRepositoryPort paymentRepositoryPort,
             PublishEventPaymentStatusPort publishEventPaymentStatusPort,
             LoggerPort logger) {
-        this.mercadoPagoWebhookSignatureValidator = mercadoPagoWebhookSignatureValidator;
+
         this.paymentRepositoryPort = paymentRepositoryPort;
         this.publishEventPaymentStatusPort = publishEventPaymentStatusPort;
         this.logger = logger;
@@ -42,11 +38,10 @@ public class ProcessPaymentNotificationUseCaseImpl implements ProcessPaymentNoti
             throw new NotificationValidationException("Signature header is missing");
         }
         /*
-        if (!mercadoPagoWebhookSignatureValidator.verifySignatureOfProvider(signature, requestId, dataIdParam)) {
-            logger.error("[WEBHOOK] Invalid signature for webhook event: {}", event);
-            throw new NotificationValidationException("Invalid signature for webhook event");
-        }
-        */
+        *
+        *   signatureValidator is not working ):
+        *
+        * */
 
 
         final String externalReference = event.getData().getExternalReference();

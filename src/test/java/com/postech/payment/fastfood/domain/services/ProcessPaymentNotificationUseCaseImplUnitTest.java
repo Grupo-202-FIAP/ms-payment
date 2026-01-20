@@ -8,7 +8,6 @@ import com.postech.payment.fastfood.domain.enums.PaymentStatus;
 import com.postech.payment.fastfood.domain.model.Payment;
 import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.Data;
 import com.postech.payment.fastfood.infrastructure.adapters.input.webhook.mercadopago.dao.WebhookEvent;
-import com.postech.payment.fastfood.infrastructure.http.mercadopago.security.MercadoPagoWebhookSignatureValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ProcessPaymentNotificationUseCaseImplUnitTest {
-
-    @Mock
-    private MercadoPagoWebhookSignatureValidator validator;
 
     @Mock
     private PaymentRepositoryPort paymentRepositoryPort;

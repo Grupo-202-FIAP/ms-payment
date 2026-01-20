@@ -40,7 +40,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         final Optional<Payment> existingQrCode = findExistingQrCode(order.getId());
         if (existingQrCode.isPresent()) {
             final Payment existingPayment = existingQrCode.get();
-            if (existingPayment.getQrCode() == null) {
+            if (existingPayment.getQrData() == null) {
                 createNewQrCodeForExistingPayment(existingPayment, order, transactionId);
             } else {
                 handleExistingQrCode(existingPayment, transactionId);
@@ -51,7 +51,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     private void handleExistingQrCode(Payment payment, UUID transactionId) {
-        if (payment.getQrCode().isExpired()) {
+        if (payment.getQrData().isExpired() == true) {
             logger.warn("[Payment][Messaging] QR Code expired for order: {}", payment.getOrderId());
             updatePaymentStatus(payment);
             final EventPayment eventPayment = new EventPayment().eventExpiring(payment, transactionId);
@@ -61,9 +61,12 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
     }
 
     private void createNewQrCodeForExistingPayment(Payment payment, Order order, UUID transactionId) {
+        if (!java.util.Objects.equals(payment.getTransactionId(), transactionId)) {
+            payment.setTransactionId(transactionId);
+        }
         final GeneratedQrCodeResponse response = paymentPort.createQrCode(payment, order.getItems());
         if (response != null) {
-            payment.setQrCode(QrCodeMapper.toDomain(response));
+            payment.setQrData(QrCodeMapper.toDomain(response));
             savePayment(payment);
         } else {
             logger.warn("[PAYMENT][USECASE] Payment creation skipped for order {} due to integration conflict.", order.getId());
@@ -75,7 +78,7 @@ public class GenerateQrCodePaymentUseCaseImpl implements GenerateQrCodePaymentUs
         final GeneratedQrCodeResponse response = paymentPort.createQrCode(payment, order.getItems());
 
         if (response != null) {
-            payment.setQrCode(QrCodeMapper.toDomain(response));
+            payment.setQrData(QrCodeMapper.toDomain(response));
             savePayment(payment);
         } else {
             logger.warn("[PAYMENT][USECASE] Payment creation skipped for order {} due to integration conflict.", order.getId());

@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QrCodeMapper {
 
+    public QrCodeMapper() {
+
+    }
+
     public static QrCode toDomain(GeneratedQrCodeResponse response) {
         if (response == null) {
             return null;
