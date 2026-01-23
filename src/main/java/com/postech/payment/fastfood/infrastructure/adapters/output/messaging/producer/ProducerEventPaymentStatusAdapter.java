@@ -3,10 +3,8 @@ package com.postech.payment.fastfood.infrastructure.adapters.output.messaging.pr
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
-
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import com.postech.payment.fastfood.application.ports.output.PublishEventPaymentStatusPort;
-
 import io.awspring.cloud.sns.core.SnsTemplate;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.sns.model.SnsException;
