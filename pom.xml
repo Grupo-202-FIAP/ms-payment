@@ -257,6 +257,11 @@
             <artifactId>spring-cloud-aws-starter-sqs</artifactId>
             <version>${spring-cloud-aws-starter-sqs.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sts</artifactId>
+        </dependency>
 
         <!--Prometheus-->
         <dependency>
