@@ -8,4 +8,6 @@ data:
   AWS_REGION: us-east-1
   SPRING_SQS_QUEUES_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-queue
   SPRING_SQS_QUEUES_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-callback-queue
-
+  PAYMENT_QUEUE_NAME: https://sqs.us-east-1.amazonaws.com/500782030170/payment-queue
+  PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-callback-queue
+  PAYMENT_CALLBACK_TOPIC: arn:aws:sns:us-east-1:500782030170:payment-callback
