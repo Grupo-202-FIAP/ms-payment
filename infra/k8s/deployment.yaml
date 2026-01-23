@@ -36,12 +36,15 @@ spec:
               value: dev
             - name: DD_VERSION
               value: "1.0.0"
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=70.0"  
           resources:
             requests:
-              cpu: "100m"
-              memory: "256Mi"
+              cpu: "500m"
+              memory: "768Mi"
             limits:
-              memory: "512Mi"
+              cpu: 1
+              memory: 1.5Gi
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
