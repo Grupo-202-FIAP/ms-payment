@@ -6,6 +6,6 @@ metadata:
 data:
   SPRING_PROFILES_ACTIVE: dev
   AWS_REGION: us-east-1
-  SPRING_SQS_QUEUES_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/056075870573/payment-queue
-  SPRING_SQS_QUEUES_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/056075870573/payment-callback-queue
+  SPRING_SQS_QUEUES_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-queue
+  SPRING_SQS_QUEUES_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-callback-queue
 
