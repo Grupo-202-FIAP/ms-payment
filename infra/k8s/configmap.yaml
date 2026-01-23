@@ -4,7 +4,7 @@ metadata:
   name: ms-payment-config
   namespace: default
 data:
-  SPRING_PROFILES_ACTIVE: dev
+  SPRING_PROFILES_ACTIVE: prod
   AWS_REGION: us-east-1
   SPRING_SQS_QUEUES_PAYMENT_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-queue
   SPRING_SQS_QUEUES_PAYMENT_CALLBACK_QUEUE: https://sqs.us-east-1.amazonaws.com/500782030170/payment-callback-queue
