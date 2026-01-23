@@ -6,7 +6,7 @@ metadata:
   labels:
     app: ms-payment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: ms-payment
@@ -33,17 +33,17 @@ spec:
             - name: DD_SERVICE
               value: ms-payment
             - name: DD_ENV
-              value: dev
+              value: prod
             - name: DD_VERSION
               value: "1.0.0"
             - name: JAVA_TOOL_OPTIONS
               value: "-XX:MaxRAMPercentage=70.0"  
           resources:
             requests:
-              cpu: "500m"
+              cpu: "300m"
               memory: "768Mi"
             limits:
-              cpu: 1
+              cpu: "500m"
               memory: 1.5Gi
           livenessProbe:
             httpGet:
