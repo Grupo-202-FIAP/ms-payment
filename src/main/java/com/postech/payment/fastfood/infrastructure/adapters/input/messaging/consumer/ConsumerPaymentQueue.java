@@ -1,16 +1,18 @@
 package com.postech.payment.fastfood.infrastructure.adapters.input.messaging.consumer;
 
 
+import org.springframework.messaging.MessagingException;
+import org.springframework.stereotype.Component;
+
 import com.postech.payment.fastfood.application.exception.ConversionException;
 import com.postech.payment.fastfood.application.exception.DatabaseException;
 import com.postech.payment.fastfood.application.exception.PaymentEventNotSupportedException;
 import com.postech.payment.fastfood.application.exception.PaymentIntegrationException;
 import com.postech.payment.fastfood.application.ports.output.LoggerPort;
 import com.postech.payment.fastfood.utils.JsonConverter;
+
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.AllArgsConstructor;
-import org.springframework.messaging.MessagingException;
-import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class ConsumerPaymentQueue {
     private final PaymentEventHandler paymentEventHandler;
     private final JsonConverter jsonConverter;
 
-    @SqsListener("${spring.cloud.aws.sqs.queues.process-payment-queue}")
+    @SqsListener("${spring.sqs.queues.payment-queue}")
     public void consumeMessage(String payload) {
         try {
             logger.info("[PaymentQueueListener] Mensagem recebida");

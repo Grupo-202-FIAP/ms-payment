@@ -21,12 +21,10 @@ spring:
   cloud:
     aws:
       sqs:
-        listener:
-          queue-lookup-strategy: ASSUME_EXISTS
         queues:
-          process-payment-queue: ${PAYMENT_QUEUE_NAME}
+          payment-queue: ${SQS_PAYMENT_QUEUE}
       sns: 
-        paymentCallbackTopic: ${PAYMENT_CALLBACK_TOPIC}
+        payment-callback-topic: ${SNS_PAYMENT_CALLBACK_TOPIC}
 
 
           
