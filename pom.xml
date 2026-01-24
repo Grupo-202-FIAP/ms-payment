@@ -28,7 +28,7 @@
     </scm>
     <properties>
         <java.version>17</java.version>
-        <spring-cloud-aws-starter-sqs.version>4.0.0-M1</spring-cloud-aws-starter-sqs.version>
+        <spring-cloud-aws-starter-sqs.version>4.0.0-RC1</spring-cloud-aws-starter-sqs.version>
         <spring-cloud-aws-starter-sns.version>4.0.0-M1</spring-cloud-aws-starter-sns.version>
 
     </properties>
